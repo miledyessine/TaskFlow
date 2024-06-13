@@ -1,0 +1,1 @@
+module.exports.Sprint = require('./sprint.model');

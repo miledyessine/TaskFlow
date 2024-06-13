@@ -1,0 +1,1 @@
+module.exports.backlogController = require('./backlog.controller');

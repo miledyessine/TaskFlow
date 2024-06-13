@@ -1,0 +1,1 @@
+module.exports.sprintController = require('./sprint.controller');
