@@ -1,15 +1,12 @@
-// src/index.js
-
 const express = require("express");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const cors = require("cors");
 const config = require("./config/config");
-const setupSwagger = require("./swagger/swagger"); // Import the Swagger setup function
+const setupSwagger = require("./swagger/swagger"); 
 const app = express();
 
 app.use(cors());
 
-// Setup Swagger documentation
 setupSwagger(app);
 
 app.use(

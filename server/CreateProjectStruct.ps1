@@ -1,8 +1,8 @@
 # Define the base directory
-$baseDirectory = "D:\Projects\TaskFlow\server\seref"
+$baseDirectory = "D:\Projects\TaskFlow\server\Yass"
 
 # Define the name variable (change this as per your project)
-$name = "seref"
+$name = "yass"
 
 # Create main source directory
 $srcDirectory = Join-Path -Path $baseDirectory -ChildPath "src"
