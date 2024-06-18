@@ -22,7 +22,7 @@ const getTask = async (id) => {
     return Task.findById(id);
 };
 
-const updateTask = async (taskId, updateBody, toDest) => {
+const updateTask = async (taskId, updateBody) => {
     const task = await getTask(taskId);
     if (!task) {
         throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
@@ -30,8 +30,6 @@ const updateTask = async (taskId, updateBody, toDest) => {
         Object.assign(task, updateBody);
         await task.save();
         return task;
-    }
-    if (toDest && toDest.key.lower() === "sprint") {
     }
 };
 

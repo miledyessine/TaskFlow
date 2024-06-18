@@ -1,44 +1,42 @@
-const { Project } = require('../models');
-const ApiError = require('../utils/ApiError');
-const httpStatus = require('http-status');
+const { Project } = require("../models");
+const ApiError = require("../utils/ApiError");
+const httpStatus = require("http-status");
 
 const createProject = async (projectBody) => {
     return Project.create(projectBody);
 };
 
 // Get all projects
-const queryProjects = async () => {
-    const projects = await Project.find();
-    return projects;
-};
-
-const getProjectById = async (id) => {
-    return Project.findById(id);
-};
-
-const getProjectsByUser = async (userId) => {
+const queryProjects = async (filter) => {
     try {
-        const projects = await Project.find({ createdBy: userId });
+        const projects = await Project.find({ ...filter });
         return projects;
     } catch (error) {
-        throw new ApiError(httpStatus.NOT_FOUND, `Could not fetch projects : ${error.message}`);
+        throw new ApiError(
+            httpStatus.NOT_FOUND,
+            `Error while fetching project items: ${error.message}`
+        );
     }
 };
 
-const updateProjectById = async (projectId, updateBody) => {
-    const project = await getProjectById(projectId);
+const getProject = async (id) => {
+    return Project.findById(id);
+};
+
+const updateProject = async (projectId, updateBody) => {
+    const project = await getProject(projectId);
     if (!project) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+        throw new ApiError(httpStatus.NOT_FOUND, "Project not found");
     }
     Object.assign(project, updateBody);
     await project.save();
     return project;
 };
 
-const deleteProjectById = async (projectId) => {
-    const project = await getProjectById(projectId);
+const deleteProject = async (projectId) => {
+    const project = await getProject(projectId);
     if (!project) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
+        throw new ApiError(httpStatus.NOT_FOUND, "Project not found");
     }
     await project.remove();
     return project;
@@ -47,8 +45,7 @@ const deleteProjectById = async (projectId) => {
 module.exports = {
     createProject,
     queryProjects,
-    getProjectById,
-    getProjectsByUser,
-    updateProjectById,
-    deleteProjectById,
+    getProject,
+    updateProject,
+    deleteProject,
 };

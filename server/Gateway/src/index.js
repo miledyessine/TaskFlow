@@ -1,10 +1,16 @@
+// src/index.js
+
 const express = require("express");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const cors = require("cors");
 const config = require("./config/config");
-
+const setupSwagger = require("./swagger/swagger"); // Import the Swagger setup function
 const app = express();
+
 app.use(cors());
+
+// Setup Swagger documentation
+setupSwagger(app);
 
 app.use(
     "/users",
@@ -14,7 +20,6 @@ app.use(
     })
 );
 
-// Proxy middleware for 'projects' service
 app.use(
     "/projects",
     createProxyMiddleware({
@@ -23,7 +28,6 @@ app.use(
     })
 );
 
-// Proxy middleware for 'backlogs' service
 app.use(
     "/backlogs",
     createProxyMiddleware({
@@ -32,7 +36,6 @@ app.use(
     })
 );
 
-// Proxy middleware for 'sprints' service
 app.use(
     "/sprints",
     createProxyMiddleware({
@@ -41,7 +44,6 @@ app.use(
     })
 );
 
-// Proxy middleware for 'tasks' service
 app.use(
     "/tasks",
     createProxyMiddleware({
