@@ -8,9 +8,16 @@ const createSprint = async (sprintBody) => {
 };
 
 // Get all sprints
-const querySprints = async () => {
-    const sprints = await Sprint.find();
-    return sprints;
+const querySprints = async (filter) => {
+    try {
+        const sprints = await Sprint.find({ ...filter });
+        return sprints;
+    } catch (error) {
+        throw new ApiError(
+            httpStatus.NOT_FOUND,
+            `Error while fetching sprint items: ${error.message}`
+        );
+    }
 };
 
 // Get a sprint by ID
@@ -18,18 +25,6 @@ const getSprint = async (id) => {
     return Sprint.findById(id);
 };
 
-// Get sprints by project
-const getSprintsByProject = async (projectId) => {
-    try {
-        const sprints = await Sprint.find({ project_id: projectId });
-        return sprints;
-    } catch (error) {
-        throw new ApiError(
-            httpStatus.NOT_FOUND,
-            `Could not fetch sprints: ${error.message}`
-        );
-    }
-};
 
 // Update a sprint by ID
 const updateSprint = async (sprintId, updateBody) => {
@@ -56,7 +51,6 @@ module.exports = {
     createSprint,
     querySprints,
     getSprint,
-    getSprintsByProject,
     updateSprint,
     deleteSprint,
 };

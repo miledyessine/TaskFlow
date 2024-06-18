@@ -14,6 +14,4 @@ router
     .patch(sprintController.updateSprint)
     .delete(sprintController.deleteSprint);
 
-router.route("/project/:id").get(sprintController.getSprintsByProject);
-
 module.exports = router;

@@ -14,6 +14,4 @@ router
     .patch(backlogController.updateBacklog)
     .delete(backlogController.deleteBacklog);
 
-router.route("/project/:id").get(backlogController.getBacklogsByProject);
-
 module.exports = router;

@@ -41,6 +41,15 @@ app.use(
     })
 );
 
+// Proxy middleware for 'tasks' service
+app.use(
+    "/tasks",
+    createProxyMiddleware({
+        target: "http://localhost:3005",
+        changeOrigin: true,
+    })
+);
+
 app.listen(config.port, () => {
     console.log(`Gateway server is running on port ${config.port}`);
 });

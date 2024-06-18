@@ -14,9 +14,9 @@ const createBacklog = async (backlogBody) => {
     }
 };
 
-const getBacklogs = async () => {
+const getBacklogs = async (filter) => {
     try {
-        const backlogs = await Backlog.find();
+        const backlogs = await Backlog.find({ ...filter });
         return backlogs;
     } catch (error) {
         throw new ApiError(
@@ -37,19 +37,6 @@ const getBacklog = async (backlogId) => {
         throw new ApiError(
             httpStatus.BAD_REQUEST,
             `Error while fetching backlog item: ${error.message}`
-        );
-    }
-};
-
-// Get backlog by project
-const getBacklogsByProject = async (projectId) => {
-    try {
-        const backlog = await Backlog.find({ project_id: projectId });
-        return backlog;
-    } catch (error) {
-        throw new ApiError(
-            httpStatus.NOT_FOUND,
-            `Could not fetch backlog: ${error.message}`
         );
     }
 };
@@ -84,7 +71,6 @@ module.exports = {
     createBacklog,
     getBacklogs,
     getBacklog,
-    getBacklogsByProject,
     updateBacklog,
     deleteBacklog,
 };

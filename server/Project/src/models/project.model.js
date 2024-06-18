@@ -11,7 +11,6 @@ const projectSchema = new Schema({
     },
     createdBy: {
         type: Schema.Types.ObjectId,
-        ref: 'User', // Assuming a User model exists
         required: true
     },
     createdAt: {

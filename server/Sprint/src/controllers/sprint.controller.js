@@ -9,7 +9,8 @@ const createSprint = catchAsync(async (req, res) => {
 });
 
 const getSprints = catchAsync(async (req, res) => {
-    const sprints = await sprintService.querySprints();
+    const filter = req.query;
+    const sprints = await sprintService.querySprints(filter);
     res.status(httpStatus.OK).send(sprints);
 });
 
@@ -21,13 +22,6 @@ const getSprint = catchAsync(async (req, res) => {
     res.status(httpStatus.OK).send(sprint);
 });
 
-const getSprintsByProject = catchAsync(async (req, res) => {
-    const sprint = await sprintService.getSprintsByProject(req.params.id);
-    if (!sprint) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Sprints not found");
-    }
-    res.status(httpStatus.OK).send(sprint);
-});
 
 const updateSprint = catchAsync(async (req, res) => {
     const sprint = await sprintService.updateSprint(req.params.id, req.body);
@@ -43,7 +37,6 @@ module.exports = {
     createSprint,
     getSprints,
     getSprint,
-    getSprintsByProject,
     updateSprint,
     deleteSprint,
 };

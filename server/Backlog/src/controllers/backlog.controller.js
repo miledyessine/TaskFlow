@@ -9,7 +9,8 @@ const createBacklog = catchAsync(async (req, res) => {
 });
 
 const getBacklogs = catchAsync(async (req, res) => {
-    const result = await backlogService.getBacklogs();
+    const filter = req.query;
+    const result = await backlogService.getBacklogs(filter);
     res.send(result);
 });
 
@@ -21,19 +22,9 @@ const getBacklog = catchAsync(async (req, res) => {
     res.send(backlog);
 });
 
-const getBacklogsByProject = catchAsync(async (req, res) => {
-    const backlog = await backlogService.getBacklogsByProject(req.params.id);
-    if (!backlog) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Backlogs not found");
-    }
-    res.status(httpStatus.OK).send(backlog);
-});
 
 const updateBacklog = catchAsync(async (req, res) => {
-    const backlog = await backlogService.updateBacklog(
-        req.params.id,
-        req.body
-    );
+    const backlog = await backlogService.updateBacklog(req.params.id, req.body);
     res.send(backlog);
 });
 
@@ -46,7 +37,6 @@ module.exports = {
     createBacklog,
     getBacklogs,
     getBacklog,
-    getBacklogsByProject,
     updateBacklog,
     deleteBacklog,
 };

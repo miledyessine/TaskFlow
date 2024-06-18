@@ -1,8 +1,8 @@
 # Define the base directory
-$baseDirectory = "D:\Projects\TaskFlow\server\Sprint"
+$baseDirectory = "D:\Projects\TaskFlow\server\seref"
 
 # Define the name variable (change this as per your project)
-$name = "sprint"
+$name = "seref"
 
 # Create main source directory
 $srcDirectory = Join-Path -Path $baseDirectory -ChildPath "src"
