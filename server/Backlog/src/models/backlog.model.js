@@ -9,5 +9,5 @@ const backlogSchema = new Schema({
     description: { type: String }
 });
 
-const Backlog = mongoose.model('Backlog', backlogSchema);
+const Backlog = mongoose.model("Backlog", backlogSchema);
 module.exports = Backlog;

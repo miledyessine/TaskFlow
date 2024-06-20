@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
-const pick = require('../utils/pick');
+const pick = require("../utils/pick");
 const catchAsync = require("../utils/catchAsync");
 const sprintService = require("../services/sprint.service");
 
@@ -10,7 +10,7 @@ const createSprint = catchAsync(async (req, res) => {
 });
 
 const getSprints = catchAsync(async (req, res) => {
-    const filter = pick(req.query, ['project_id', 'name']);
+    const filter = pick(req.query, ["project_id", "name"]);
     const sprints = await sprintService.querySprints(filter);
     res.status(httpStatus.OK).send(sprints);
 });

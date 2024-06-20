@@ -1,1 +1,1 @@
-module.exports.projectService = require('./project.service');
+module.exports.projectService = require("./project.service");

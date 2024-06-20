@@ -1,1 +1,1 @@
-module.exports.backlogController = require('./backlog.controller');
+module.exports.backlogController = require("./backlog.controller");

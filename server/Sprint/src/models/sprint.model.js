@@ -7,22 +7,22 @@ function calculateEndDate(startDate, duration) {
     let endDateObj;
 
     switch(duration) {
-        case '1week':
-            endDateObj = new Date(startDateObj.setDate(startDateObj.getDate() + 7));
-            break;
-        case '2weeks':
-            endDateObj = new Date(startDateObj.setDate(startDateObj.getDate() + 14));
-            break;
-        case '3weeks':
-            endDateObj = new Date(startDateObj.setDate(startDateObj.getDate() + 21));
-            break;
-        case '4weeks':
-            endDateObj = new Date(startDateObj.setDate(startDateObj.getDate() + 28));
-            break;
-        case 'custom':
-        default:
-            endDateObj = null;
-            break;
+    case "1week":
+        endDateObj = new Date(startDateObj.setDate(startDateObj.getDate() + 7));
+        break;
+    case "2weeks":
+        endDateObj = new Date(startDateObj.setDate(startDateObj.getDate() + 14));
+        break;
+    case "3weeks":
+        endDateObj = new Date(startDateObj.setDate(startDateObj.getDate() + 21));
+        break;
+    case "4weeks":
+        endDateObj = new Date(startDateObj.setDate(startDateObj.getDate() + 28));
+        break;
+    case "custom":
+    default:
+        endDateObj = null;
+        break;
     }
 
     return endDateObj;
@@ -35,19 +35,19 @@ const sprintSchema = new Schema({
     duration: { 
         type: String, 
         required: true, 
-        enum: ['1week', '2weeks', '3weeks', '4weeks', 'custom'],
+        enum: ["1week", "2weeks", "3weeks", "4weeks", "custom"],
     },
     start_date: { type: Date,default: Date.now, required: true },
     end_date: { type: Date },
 });
 
 // Pre-save hook to calculate end_date based on duration if needed
-sprintSchema.pre('save', function(next) {
-    if (this.duration !== 'custom' && this.start_date) {
+sprintSchema.pre("save", function(next) {
+    if (this.duration !== "custom" && this.start_date) {
         this.end_date = calculateEndDate(this.start_date, this.duration);
     }
     next();
 });
 
-const Sprint = mongoose.model('Sprint', sprintSchema);
+const Sprint = mongoose.model("Sprint", sprintSchema);
 module.exports = Sprint;

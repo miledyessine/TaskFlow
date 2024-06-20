@@ -1,1 +1,1 @@
-module.exports.sprintController = require('./sprint.controller');
+module.exports.sprintController = require("./sprint.controller");

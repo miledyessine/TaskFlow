@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
-const pick = require('../utils/pick');
+const pick = require("../utils/pick");
 const catchAsync = require("../utils/catchAsync");
 const { taskService } = require("../services");
 
@@ -10,7 +10,7 @@ const createTask = catchAsync(async (req, res) => {
 });
 
 const getTasks = catchAsync(async (req, res) => {
-    const filter = pick(req.query, ['backlog_id','sprint_id', 'name','status','priority','assignee_id']);
+    const filter = pick(req.query, ["backlog_id","sprint_id", "name","status","priority","assignee_id"]);
     const result = await taskService.queryTasks(filter);
     res.send(result);
 });
@@ -39,7 +39,7 @@ const createSubtask = catchAsync(async (req, res) => {
 });
 
 const getSubtasks = catchAsync(async (req, res) => {
-    const filter = pick(req.query, ['backlog_id','sprint_id', 'name','status','priority','assignee_id']);
+    const filter = pick(req.query, ["backlog_id","sprint_id", "name","status","priority","assignee_id"]);
     const result = await taskService.querySubtasks(filter);
     res.send(result);
 });

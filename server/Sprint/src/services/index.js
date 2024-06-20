@@ -1,1 +1,1 @@
-module.exports.sprintService = require('./sprint.service');
+module.exports.sprintService = require("./sprint.service");

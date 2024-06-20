@@ -1,1 +1,1 @@
-module.exports.Project = require('./project.model');
+module.exports.Project = require("./project.model");

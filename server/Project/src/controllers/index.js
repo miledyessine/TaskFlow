@@ -1,1 +1,1 @@
-module.exports.projectController = require('./project.controller');
+module.exports.projectController = require("./project.controller");

@@ -1,7 +1,7 @@
 const express = require("express");
-const ApiError = require('./utils/ApiError');
+const ApiError = require("./utils/ApiError");
 const routes = require("./routes/project.route");
-const httpStatus = require('http-status');
+const httpStatus = require("http-status");
 
 const app = express();
 

@@ -1,1 +1,1 @@
-module.exports.taskService = require('./task.service');
+module.exports.taskService = require("./task.service");

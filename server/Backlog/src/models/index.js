@@ -1,1 +1,1 @@
-module.exports.Backlog = require('./backlog.model');
+module.exports.Backlog = require("./backlog.model");

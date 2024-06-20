@@ -1,6 +1,6 @@
 const { User } = require("../models");
-const ApiError = require('../utils/ApiError');
-const httpStatus = require('http-status');
+const ApiError = require("../utils/ApiError");
+const httpStatus = require("http-status");
 
 
 const createUser = async (userBody) => {

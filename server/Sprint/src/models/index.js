@@ -1,1 +1,1 @@
-module.exports.Sprint = require('./sprint.model');
+module.exports.Sprint = require("./sprint.model");

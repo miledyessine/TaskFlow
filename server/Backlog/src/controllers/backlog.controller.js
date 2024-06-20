@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
-const pick = require('../utils/pick');
+const pick = require("../utils/pick");
 const catchAsync = require("../utils/catchAsync");
 const { backlogService } = require("../services");
 
@@ -10,7 +10,7 @@ const createBacklog = catchAsync(async (req, res) => {
 });
 
 const getBacklogs = catchAsync(async (req, res) => {
-    const filter = pick(req.query, ['project_id', 'name']);
+    const filter = pick(req.query, ["project_id", "name"]);
     const result = await backlogService.getBacklogs(filter);
     res.send(result);
 });
