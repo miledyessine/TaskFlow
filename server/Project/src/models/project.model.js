@@ -16,6 +16,26 @@ const projectSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    typesOfTickets: {
+        type: [String],
+        required: true,
+        validate: {
+            validator: function(arr) {
+                return arr.length > 0;
+            },
+            message: 'There should be at least one type of ticket.'
+        }
+    },
+    workflow: {
+        type: [String],
+        required: true,
+        validate: {
+            validator: function(arr) {
+                return arr.length >= 2;
+            },
+            message: 'There should be at least two steps in the workflow.'
+        }
     }
 });
 

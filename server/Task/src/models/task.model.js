@@ -7,7 +7,8 @@ const taskSchema = new Schema({
     sprint_id: { type: Schema.Types.ObjectId },
     name: { type: String, required: true },
     description: { type: String },
-    status: { type: String, enum: ["To Do", "In Progress", "Done"], required: true },
+    status: { type: String, required: true },
+    typeOfTicket: { type: String, required: true },
     priority: { type: Number, required: true },
     due_date: { type: Date },
     assignee_id: { type: Schema.Types.ObjectId }
@@ -28,7 +29,8 @@ const subtaskSchema = new Schema({
     task_id: { type: Schema.Types.ObjectId, ref: "Task", required: true },
     name: { type: String, required: true },
     description: { type: String },
-    status: { type: String, enum: ["To Do", "In Progress", "Done"], required: true },
+    status: { type: String, required: true },
+    typeOfTicket: { type: String, required: true },
     priority: { type: Number, required: true },
     due_date: { type: Date },
     assignee_id: { type: Schema.Types.ObjectId }
