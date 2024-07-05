@@ -1,35 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Footer from "./components/Footer/Footer";
 import { Navbar } from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
-import Home from "./pages/Home";
 import { cn } from "./lib/utils";
 
-import { Outlet } from "react-router-dom"
+import { Outlet } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useMediaQuery } from "./hooks/useMediaQuery";
 function App() {
     const { isAuthenticated } = useAuth0();
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
-        window.innerWidth <= 768
-    );
-const handleResize = () => {
-            if (window.innerWidth <= 768) {
-                setIsSidebarCollapsed(true);
-            } else {
-                setIsSidebarCollapsed(false);
-            }
-        };
-    useEffect(() => {
-        
-        handleResize();
+    const isDesktop = useMediaQuery("(min-width: 768px)");
 
-        window.addEventListener("resize", handleResize);
-
-        // Cleanup the event listener on component unmount
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(!isDesktop);
 
     return (
         <>

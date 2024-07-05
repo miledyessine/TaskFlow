@@ -24,7 +24,7 @@ import { getInitials } from "@/hooks/getInitials";
 const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
     const { user } = useAuth0();
     return (
-        <div className="overflow-hidden border-r-1 fixed top-[57px] h-full flex-col justify-between">
+        <div className="overflow-hidden z-40 border-r-1 fixed top-[57px] h-full flex-col justify-between">
             <RPSidebar
                 width={isCollapsed ? "80px" : "230px"}
                 className="h-full bg-white"
@@ -32,7 +32,7 @@ const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
                 collapsedWidth="md"
                 transitionDuration="500"
             >
-                <div className="flex justify-center p-2 max-[600px]:p-4 text-sm font-semibold text-slate-700 dark:text-slate-50">
+                <div className="flex justify-center p-2 max-[600px]:p-4 text-sm font-semibold text-gray-700 dark:text-gray-50">
                     {isCollapsed ? (
                         <div className="relative w-full flex items-center ">
                             <Avatar className="max-[600px]:w-10 max-[600px]:h-10 ">
@@ -90,6 +90,7 @@ const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
                         <SubMenu
                             label={!isCollapsed ? "Projects" : null}
                             icon={<FolderOpenDot size={22} />}
+                            component={<Link to="/projects" />}
                         >
                             <MenuItem icon={<FileSpreadsheet size={22} />}>
                                 Project 1

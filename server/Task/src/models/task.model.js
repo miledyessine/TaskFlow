@@ -7,7 +7,7 @@ const taskSchema = new Schema({
     sprint_id: { type: Schema.Types.ObjectId },
     name: { type: String, required: true },
     description: { type: String },
-    status: { type: String, required: true },
+    : { type: String, required: true },
     typeOfTicket: { type: String, required: true },
     priority: { type: Number, required: true },
     due_date: { type: Date },

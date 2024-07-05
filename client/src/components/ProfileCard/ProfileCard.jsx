@@ -28,7 +28,7 @@ const ProfileCard = () => {
         setFormData({ ...formData, [name]: value });
     };
     const handleRoleChange = (value) => {
-        setFormData({ ...formData, role: value }); // Set role as an array
+        setFormData({ ...formData, role: value });
     };
     const handleEditing = async () => {
         setIsEditing(true);
@@ -59,7 +59,7 @@ const ProfileCard = () => {
             </CardHeader>
             <CardContent className="p-4">
                 <div className="space-y-4">
-                    <div>
+                    <div className="grid gap-2">
                         <Label htmlFor="username">Username</Label>
                         <Input
                             id="username"
@@ -69,7 +69,7 @@ const ProfileCard = () => {
                             disabled={!isEditing}
                         />
                     </div>
-                    <div>
+                    <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
                         <Input
                             id="email"
@@ -79,7 +79,7 @@ const ProfileCard = () => {
                             disabled={!isEditing}
                         />
                     </div>
-                    <div>
+                    <div className="grid gap-2">
                         <Label htmlFor="role">Role</Label>
                         <Select
                             onChange={handleRoleChange}

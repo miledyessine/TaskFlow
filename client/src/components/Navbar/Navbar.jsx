@@ -4,8 +4,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Link } from "react-router-dom";
-
+import { useTheme } from "@/components/ThemeProvider";
 export function Navbar() {
+    const { setTheme } = useTheme();
     const { loginWithRedirect, isAuthenticated, logout } = useAuth0();
     const handleSignup = async () => {
         await loginWithRedirect({
@@ -17,7 +18,7 @@ export function Navbar() {
         await loginWithRedirect();
     };
     return (
-        <div className="fixed z-50 h-[57px] w-full bg-white border-b flex items-center justify-between px-20">
+        <div className="fixed z-50 h-[57px] w-full bg-white border-b flex items-center justify-between px-5 md:px-16">
             <div className="flex items-center">
                 <Link to="/">
                     <Button variant="outline" size="icon" aria-label="Home">
@@ -28,6 +29,19 @@ export function Navbar() {
                     TaskFlow
                 </Label>
             </div>
+            {/* <Tabs defaultValue="dark" className="gap-1.5 text-sm">
+                <TabsList>
+                    <TabsTrigger
+                        value="light"
+                        onClick={() => setTheme("light")}
+                    >
+                        Light
+                    </TabsTrigger>
+                    <TabsTrigger value="dark" onClick={() => setTheme("dark")}>
+                        Dark
+                    </TabsTrigger>
+                </TabsList>
+            </Tabs> */}
             {!isAuthenticated && (
                 <Tabs defaultValue="signup" className="gap-1.5 text-sm">
                     <TabsList>
