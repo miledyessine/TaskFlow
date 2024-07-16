@@ -11,7 +11,7 @@ function Projects() {
         setOpenCreate(true);
     };
     return (
-        <div className="min-h-screen md:m-6 m-2">
+        <div className="md:m-6 m-2">
             <div className="flex items-center justify-between ">
                 <h3 className="text-2xl font-semibold tracking-tight">
                     Projects
@@ -23,7 +23,6 @@ function Projects() {
 
             <div className="classgroup mt-5">
                 <ul className="grid w-full gap-7 p-4  sm:grid-cols-3 md:grid-cols-4 md:gap-4 sm:gap-5 ">
-                    
                         <ProjectCard
                             title={"test"}
                             description={"description"}

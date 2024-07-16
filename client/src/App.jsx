@@ -34,7 +34,6 @@ function App() {
             >
                 <Outlet />
             </main>
-            <Footer />
         </>
     );
 }

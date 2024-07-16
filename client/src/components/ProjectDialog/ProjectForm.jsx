@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Trash } from "lucide-react"; // Importing Trash icon
+import { Trash2 } from "lucide-react"; // Importing Trash icon
 
 export function ProjectForm({ className }) {
     const [formData, setFormData] = useState({
@@ -96,7 +96,7 @@ export function ProjectForm({ className }) {
                                 "typesOfTickets"
                             )}
                         >
-                            <Trash className="w-4 h-4 hover:text-red-500" />
+                            <Trash2 className="w-4 h-4 hover:text-red-500" />
                         </Button>
                     </div>
                 ))}
@@ -126,7 +126,7 @@ export function ProjectForm({ className }) {
                                 "workflow"
                             )}
                         >
-                            <Trash className="w-4 h-4 hover:text-red-500" />
+                            <Trash2 className="w-4 h-4 hover:text-red-500" />
                         </Button>
                     </div>
                 ))}

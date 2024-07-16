@@ -16,7 +16,7 @@ import {
 import { DatePicker } from "../ui/date-picker";
 
 import { format } from "date-fns";
-export function TaskForm({ className }) {
+export function SubtaskForm({ className }) {
     const [formData, setFormData] = useState({
         name: "",
         description: "",

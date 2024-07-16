@@ -4,6 +4,7 @@ import Home from "@/pages/Home";
 import Profile from "@/pages/Profile";
 import Projects from "@/pages/Projects";
 import Project from "@/pages/Project";
+import Sprint from "@/pages/Sprint";
 
 const router = createBrowserRouter([
     {
@@ -30,7 +31,11 @@ const router = createBrowserRouter([
                         element: <Project />,
                     },
                 ]
-            }
+            },
+            {
+                path:"sprint",
+                element: <Sprint />,
+            },
         ],
     },
 ]);

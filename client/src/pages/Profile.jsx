@@ -2,7 +2,7 @@ import ProfileCard from "@/components/ProfileCard/ProfileCard";
 
 function Profile() {
     return (
-        <div className="min-h-screen">
+        <div>
             <ProfileCard/>
         </div>
     );

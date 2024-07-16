@@ -6,13 +6,13 @@ import {
     DndContext,
     closestCenter,
     KeyboardSensor,
-    PointerSensor,
+    MouseSensor,
     useSensor,
     useSensors,
     DragOverlay,
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Crown } from "lucide-react";
 import { DroppableTable } from "@/components/SprintTable/DroppableTable";
@@ -25,6 +25,24 @@ const initialTasks = [
         dueDate: "Jun 20",
         status: "To Do",
         sprintId: "1",
+        subtasks: [
+            {
+                id: "1-1",
+                name: "SubTask 1",
+                assignee: "Yessine Miled",
+                dueDate: "Jun 20",
+                status: "To Do",
+                sprintId: "1",
+            },
+            {
+                id: "1-2",
+                name: "Subtask 2",
+                status: "In Progress",
+                assignee: "Yessine Miled",
+                dueDate: "Jun 20",
+                sprintId: "1",
+            },
+        ],
     },
     {
         id: "2",
@@ -71,7 +89,12 @@ function Project() {
     };
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(MouseSensor, {
+            activationConstraint: {
+                delay: 250,
+                distance: 10,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -83,6 +106,7 @@ function Project() {
 
     const handleDragOver = (event) => {
         const { over } = event;
+        console.log("Table Over:", over);
         if (over && initialTables.some((table) => table.id === over.id)) {
             setOverTableId(over.id);
         }
@@ -90,6 +114,8 @@ function Project() {
 
     const handleDragEnd = (event) => {
         const { active, over } = event;
+        console.log("active", active);
+        console.log("over", over);
         if (active && initialTables.some((table) => table.id === over.id)) {
             const newSprintId = over.id;
 
@@ -129,10 +155,10 @@ function Project() {
     }
 
     return (
-        <div className="min-h-screen md:m-6 m-2">
+        <div className="md:m-6 m-2">
             <div className="flex items-center justify-between">
                 <h3 className="text-2xl font-semibold tracking-tight">
-                    Projects / Project Name{"  "}
+                    Project Name{"  "}
                     <Badge className="gap-0.5">
                         <Crown size={13} />
                         Yessine
@@ -166,9 +192,11 @@ function Project() {
                     ))}
                     <DragOverlay>
                         {activeId ? (
-                            <div className="border border-gray-300 shadow-md rounded-md">
-                                {renderTaskDetails(tasks, activeId)}
-                            </div>
+                            <Table>
+                                <TableBody>
+                                    {renderTaskDetails(tasks, activeId)}
+                                </TableBody>
+                            </Table>
                         ) : null}
                     </DragOverlay>
                 </DndContext>

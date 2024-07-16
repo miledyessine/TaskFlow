@@ -23,6 +23,8 @@ import SprintRow from "./SprintRow";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { TaskCreate } from "../TaskDialog/TaskCreate";
+import { TicketPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 export function DroppableTable({ table, tasks }) {
     const [open, setOpen] = useState(false);
     const handleOpenCreateDialog = async () => {
@@ -36,10 +38,27 @@ export function DroppableTable({ table, tasks }) {
         <Card>
             <CardHeader className="px-7">
                 <div className="flex items-center justify-between">
-                    <CardTitle>{table.title}</CardTitle>
-                    <Button variant="outline" onClick={handleOpenCreateDialog}>
-                        Add Task
-                    </Button>
+                    <div className="flex items-center justify-between gap-2">
+                        <Link to={"/sprint"}>
+                            <CardTitle>{table.title}</CardTitle>
+                        </Link>
+                        <CardDescription>20 jun - 19 jul</CardDescription>
+                        <CardDescription className="text-xs text-gray-400">
+                            ({tasks.length} tickets)
+                        </CardDescription>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                        <Button variant="outline">Start Sprint</Button>
+                        <Button
+                            variant="outline"
+                            onClick={handleOpenCreateDialog}
+                        >
+                            <TicketPlus className="h-4 w-4 mr-1" />
+                            <span className="sr-only sm:not-sr-only">
+                                Add Task
+                            </span>
+                        </Button>
+                    </div>
                 </div>
                 <CardDescription>{table.description}</CardDescription>
             </CardHeader>
@@ -56,10 +75,11 @@ export function DroppableTable({ table, tasks }) {
                             <TableHead>Assignee</TableHead>
                             <TableHead>Due Date</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <SortableContext
-                        items={tasks.map((task) => task.id)}
+                        items={tasks}
                         strategy={rectSortingStrategy}
                     >
                         <TableBody ref={setNodeRef}>
