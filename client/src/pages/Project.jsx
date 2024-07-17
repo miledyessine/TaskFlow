@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/prop-types */
 import { SprintCreate } from "@/components/SprintDialog/SprintCreate";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     DndContext,
     closestCenter,
@@ -16,77 +17,69 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Crown } from "lucide-react";
 import { DroppableTable } from "@/components/SprintTable/DroppableTable";
-
-const initialTasks = [
-    {
-        id: "1",
-        name: "Task 1",
-        assignee: "Yessine Miled",
-        dueDate: "Jun 20",
-        status: "To Do",
-        sprintId: "1",
-        subtasks: [
-            {
-                id: "1-1",
-                name: "SubTask 1",
-                assignee: "Yessine Miled",
-                dueDate: "Jun 20",
-                status: "To Do",
-                sprintId: "1",
-            },
-            {
-                id: "1-2",
-                name: "Subtask 2",
-                status: "In Progress",
-                assignee: "Yessine Miled",
-                dueDate: "Jun 20",
-                sprintId: "1",
-            },
-        ],
-    },
-    {
-        id: "2",
-        name: "Task 2",
-        assignee: "Yessine Miled",
-        dueDate: "Jun 21",
-        status: "In Progress",
-        sprintId: "1",
-    },
-    {
-        id: "3",
-        name: "Task 3",
-        assignee: "Yessine Miled",
-        dueDate: "Jun 22",
-        status: "Done",
-        sprintId: "2",
-    },
-];
-
-const initialTables = [
-    {
-        id: "1",
-        title: "Sprint 1",
-        description: "Sprint 1 Description",
-        tasks: initialTasks,
-    },
-    {
-        id: "2",
-        title: "Sprint 2",
-        description: "Sprint 2 Description",
-        tasks: initialTasks,
-    },
-];
+import { useParams } from "react-router-dom";
+import { useAxios } from "@/hooks/axioshook";
+import { Skeleton } from "@/components/ui/skeleton";
+import axios from "axios";
 
 function Project() {
+    const { project_id } = useParams();
     const [open, setOpen] = useState(false);
-    const [tables, setTables] = useState(initialTables);
-    const [tasks, setTasks] = useState(initialTasks);
+    const [project, setProject] = useState();
+    const [user, setUser] = useState();
+    const [tables, setTables] = useState();
+    const [tasks, setTasks] = useState();
     const [activeId, setActiveId] = useState(null);
     const [overTableId, setOverTableId] = useState(null);
+
+    const projectData = useAxios({
+        method: "GET",
+        url: `/projects/${project_id}`,
+    });
+    const backlogs = useAxios({
+        method: "GET",
+        url: `/backlogs?project_id=${project_id}`,
+    });
+    const sprints = useAxios({
+        method: "GET",
+        url: `/sprints?project_id=${project_id}`,
+    });
+    // important change it to tasks?project_id=${project_id}
+    const tasksData = useAxios({
+        method: "GET",
+        url: "/tasks",
+    });
+
+    console.log(tasks);
+    console.log(tables);
 
     const handleOpenCreateDialog = async () => {
         setOpen(true);
     };
+    useEffect(() => {
+        if (backlogs.response && sprints.response) {
+            setTables([...sprints.response, ...backlogs.response]);
+        }
+        if (tasksData.response) {
+            setTasks([tasksData.response][0]);
+        }
+        if (projectData.response) {
+            setProject(projectData.response);
+            axios
+                .get(`/users/${projectData.response.createdBy}`)
+                .then((userResponse) => {
+                    setUser(userResponse.data);
+                })
+                .catch((error) => {
+                    console.error("Error fetching user data:", error);
+                });
+        }
+    }, [
+        backlogs.response,
+        sprints.response,
+        tasksData.response,
+        projectData.response,
+    ]);
 
     const sensors = useSensors(
         useSensor(MouseSensor, {
@@ -107,7 +100,7 @@ function Project() {
     const handleDragOver = (event) => {
         const { over } = event;
         console.log("Table Over:", over);
-        if (over && initialTables.some((table) => table.id === over.id)) {
+        if (over && tables.some((table) => table._id === over.id)) {
             setOverTableId(over.id);
         }
     };
@@ -116,12 +109,12 @@ function Project() {
         const { active, over } = event;
         console.log("active", active);
         console.log("over", over);
-        if (active && initialTables.some((table) => table.id === over.id)) {
+        if (active && tables.some((table) => table._id === over.id)) {
             const newSprintId = over.id;
 
             const updatedTasks = tasks.map((task) =>
-                task.id === active.id
-                    ? { ...task, sprintId: newSprintId }
+                task._id === active.id
+                    ? { ...task, sprint_id: newSprintId }
                     : task
             );
 
@@ -130,7 +123,9 @@ function Project() {
                 prevTables.map((table) => ({
                     ...table,
                     tasks: updatedTasks.filter(
-                        (task) => task.sprintId === table.id
+                        (task) =>
+                            task.sprint_id === table.id ||
+                            task.backlog_id === table.id
                     ),
                 }))
             );
@@ -141,14 +136,19 @@ function Project() {
     };
 
     function renderTaskDetails(tasks, activeId) {
-        const task = tasks.find((task) => task.id === activeId);
+        const task = tasks.find((task) => task._id === activeId);
         if (!task) return null;
 
         return (
             <TableRow>
                 <TableCell className="font-medium">{task.name}</TableCell>
-                <TableCell>{task.assignee}</TableCell>
-                <TableCell>{task.dueDate}</TableCell>
+                <TableCell>Assignee</TableCell>
+                <TableCell>
+                    {new Date(task.due_date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                    })}
+                </TableCell>
                 <TableCell>{task.status}</TableCell>
             </TableRow>
         );
@@ -156,51 +156,66 @@ function Project() {
 
     return (
         <div className="md:m-6 m-2">
-            <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-semibold tracking-tight">
-                    Project Name{"  "}
-                    <Badge className="gap-0.5">
-                        <Crown size={13} />
-                        Yessine
-                    </Badge>
-                </h3>
+            {projectData.loading && (
+                <div className="flex items-center justify-between">
+                    <Skeleton className="h-10 w-[160px]" />
+                    <Skeleton className="h-10 w-[160px]" />
+                </div>
+            )}
+            {project && (
+                <div className="flex items-center justify-between">
+                    <h3 className="text-2xl font-semibold tracking-tight ">
+                        {project.name}
+                        {"  "}
+                        <Badge className="gap-0.5">
+                            <Crown size={13} />
+                            {user?.username || (
+                                <Skeleton className="h-5 w-[80px]" />
+                            )}
+                        </Badge>
+                    </h3>
 
-                <Button variant="outline" onClick={handleOpenCreateDialog}>
-                    Create a new sprint
-                </Button>
-            </div>
+                    <Button variant="outline" onClick={handleOpenCreateDialog}>
+                        Create a new sprint
+                    </Button>
+                </div>
+            )}
             <br />
-            <div className="space-y-4">
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragStart={handleDragStart}
-                    onDragOver={handleDragOver}
-                    onDragEnd={handleDragEnd}
-                >
-                    {tables.map((table) => (
-                        <DroppableTable
-                            key={table.id}
-                            table={table}
-                            tasks={
-                                tasks.filter(
-                                    (task) => task.sprintId === table.id
-                                ) || []
-                            }
-                            isOver={overTableId === table.id}
-                        />
-                    ))}
-                    <DragOverlay>
-                        {activeId ? (
-                            <Table>
-                                <TableBody>
-                                    {renderTaskDetails(tasks, activeId)}
-                                </TableBody>
-                            </Table>
-                        ) : null}
-                    </DragOverlay>
-                </DndContext>
-            </div>
+            {tables && tasks && (
+                <div className="space-y-4">
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragStart={handleDragStart}
+                        onDragOver={handleDragOver}
+                        onDragEnd={handleDragEnd}
+                    >
+                        {tables.map((table) => (
+                            <DroppableTable
+                                key={table.id}
+                                table={table}
+                                tasks={
+                                    tasks.filter(
+                                        (task) =>
+                                            task.sprint_id === table._id ||
+                                            task.backlog_id === table._id
+                                    ) || []
+                                }
+                                isOver={overTableId === table._id}
+                            />
+                        ))}
+                        <DragOverlay>
+                            {activeId ? (
+                                <Table>
+                                    <TableBody>
+                                        {renderTaskDetails(tasks, activeId)}
+                                    </TableBody>
+                                </Table>
+                            ) : null}
+                        </DragOverlay>
+                    </DndContext>
+                </div>
+            )}
             {open && <SprintCreate open={open} setOpen={setOpen} />}
         </div>
     );

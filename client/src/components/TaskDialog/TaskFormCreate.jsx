@@ -16,7 +16,7 @@ import {
 import { DatePicker } from "../ui/date-picker";
 
 import { format } from "date-fns";
-export function TaskForm({ className }) {
+export function TaskFormCreate({ className }) {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -26,7 +26,6 @@ export function TaskForm({ className }) {
         assignee: "",
         due_date: "",
     });
-
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setFormData((prev) => ({ ...prev, [id]: value }));

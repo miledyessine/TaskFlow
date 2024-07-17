@@ -12,7 +12,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 
-export function DatePicker({ onSelect,disabledBtn }) {
+export function DatePicker({ onSelect,disabledBtn ,datePlaceholder}) {
     const [date, setDate] = useState();
 
     const handleDateSelect = (selectedDate) => {
@@ -31,7 +31,7 @@ export function DatePicker({ onSelect,disabledBtn }) {
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "MM/dd/yyyy") : <span>Pick a date</span>}
+                    {date ? format(date, "MM/dd/yyyy") : <span>{datePlaceholder||"Pick a date"}</span>}
                 </Button>
             </PopoverTrigger>
             <PopoverContent  className="w-auto p-0">

@@ -11,9 +11,10 @@ import {
     Workflow,
     ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TaskEdit } from "../TaskDialog/TaskEdit";
 import { TaskView } from "../TaskDialog/TaskView";
+import { useAxios } from "@/hooks/axioshook";
 
 function SprintRow({ task }) {
     const {
@@ -24,9 +25,14 @@ function SprintRow({ task }) {
         transition,
         isDragging,
     } = useSortable({
-        id: task.id,
+        id: task._id,
     });
 
+    const user = useAxios({
+        method: "GET",
+        url: `/users/${task.assignee_id}`,
+    });
+    const [userData,setUserData] = useState();
     const [openSubtask, setOpenSubtask] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [openView, setOpenView] = useState(false);
@@ -53,7 +59,11 @@ function SprintRow({ task }) {
         opacity: isDragging ? 0.5 : 1,
         border: isDragging ? "1px dashed #aaa" : "none",
     };
-
+useEffect(() => {
+        if (user.response) {
+            setUserData(user.response);
+        }
+    }, [user.response]);
     return (
         <>
             <TableRow
@@ -94,8 +104,14 @@ function SprintRow({ task }) {
                         </span>
                     )}
                 </TableCell>
-                <TableCell>{task.assignee}</TableCell>
-                <TableCell>{task.dueDate}</TableCell>
+                <TableCell>{userData?userData.username:"Loading..."}</TableCell>
+                            
+                <TableCell>
+                    {new Date(task.due_date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                    })}
+                </TableCell>
                 <TableCell>{task.status}</TableCell>
                 <TableCell className="flex gap-2">
                     <Eye
@@ -123,8 +139,16 @@ function SprintRow({ task }) {
                                 <Workflow size={14} className="mr-1" />
                                 {subtask.name}
                             </TableCell>
-                            <TableCell>{subtask.assignee}</TableCell>
-                            <TableCell>{subtask.dueDate}</TableCell>
+                            <TableCell>{userData?userData.username:"Loading..."}</TableCell>
+                            <TableCell>
+                                {new Date(task.due_date).toLocaleDateString(
+                                    "en-GB",
+                                    {
+                                        day: "2-digit",
+                                        month: "short",
+                                    }
+                                )}
+                            </TableCell>
                             <TableCell>{subtask.status}</TableCell>
                             <TableCell className="flex gap-2">
                                 <Eye
@@ -147,9 +171,9 @@ function SprintRow({ task }) {
                     ))}
                 </>
             )}
-            {openEdit && <TaskEdit open={openEdit} setOpen={setOpenEdit} />}
+            {openEdit && <TaskEdit task={task} assignee={userData} open={openEdit} setOpen={setOpenEdit} />}
             {openView && (
-                <TaskView task={task} open={openView} setOpen={setOpenView} />
+                <TaskView task={task} assignee={userData} open={openView} setOpen={setOpenView} />
             )}
         </>
     );

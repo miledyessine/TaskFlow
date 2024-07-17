@@ -17,7 +17,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 redirect_uri: window.location.origin,
             }}
         >
-            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
                 <RouterProvider router={router} />
             </ThemeProvider>
         </Auth0Provider>

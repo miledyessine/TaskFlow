@@ -31,18 +31,30 @@ export function DroppableTable({ table, tasks }) {
         setOpen(true);
     };
     const { setNodeRef } = useDroppable({
-        id: table.id,
+        id: table._id,
     });
-
     return (
         <Card>
             <CardHeader className="px-7">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center justify-between gap-2">
-                        <Link to={"/sprint"}>
-                            <CardTitle>{table.title}</CardTitle>
+                        <Link to={`/sprint/${table._id}`}>
+                            <CardTitle>{table.name}</CardTitle>
                         </Link>
-                        <CardDescription>20 jun - 19 jul</CardDescription>
+                        {table.start_date && (
+                            <CardDescription>
+                                {new Date(table.start_date).toLocaleDateString(
+                                    "en-GB",
+                                    { day: "2-digit", month: "short" }
+                                )}{" "}
+                                -{" "}
+                                {new Date(table.end_date).toLocaleDateString(
+                                    "en-GB",
+                                    { day: "2-digit", month: "short" }
+                                )}
+                            </CardDescription>
+                        )}
+
                         <CardDescription className="text-xs text-gray-400">
                             ({tasks.length} tickets)
                         </CardDescription>
@@ -85,7 +97,7 @@ export function DroppableTable({ table, tasks }) {
                         <TableBody ref={setNodeRef}>
                             {tasks.length > 0 ? (
                                 tasks.map((task) => (
-                                    <SprintRow key={task.id} task={task} />
+                                    <SprintRow key={task._id} task={task} />
                                 ))
                             ) : (
                                 <TableRow>

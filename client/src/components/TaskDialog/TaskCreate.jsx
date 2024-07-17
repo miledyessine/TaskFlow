@@ -18,7 +18,7 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { TaskForm } from "./TaskForm";
+import { TaskFormCreate } from "./TaskFormCreate";
 
 export function TaskCreate({ open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -33,7 +33,7 @@ export function TaskCreate({ open, setOpen }) {
                             Create your task here. Click save when youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <TaskForm />
+                    <TaskFormCreate />
                 </DialogContent>
             </Dialog>
         );
@@ -41,14 +41,14 @@ export function TaskCreate({ open, setOpen }) {
 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerContent >
+            <DrawerContent>
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Create task</DrawerTitle>
                     <DrawerDescription>
                         Create your task here. Click save when youre done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <TaskForm className="px-4" />
+                <TaskFormCreate className="px-4" />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>

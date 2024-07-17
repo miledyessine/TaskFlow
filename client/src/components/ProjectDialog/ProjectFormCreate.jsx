@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react"; // Importing Trash icon
 
-export function ProjectForm({ className }) {
+export function ProjectFormCreate({ className }) {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
         typesOfTickets: [""],
         workflow: ["", ""],
+        createdBy:""
     });
 
     const handleInputChange = (e) => {
@@ -20,7 +21,7 @@ export function ProjectForm({ className }) {
         setFormData((prev) => ({ ...prev, [id]: value }));
     };
 
-    const handleArrayChange = (e, index, key) => {
+    const handleArrayChange = (index, key, e) => {
         const { value } = e.target;
         const updatedArray = [...formData[key]];
         updatedArray[index] = value;
@@ -46,7 +47,7 @@ export function ProjectForm({ className }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Add your form submission logic here
+        console.log(formData);
     };
 
     return (
@@ -81,11 +82,9 @@ export function ProjectForm({ className }) {
                         <Input
                             type="text"
                             value={ticket}
-                            onChange={handleArrayChange.bind(
-                                null,
-                                index,
-                                "typesOfTickets"
-                            )}
+                            onChange={(e) =>
+                                handleArrayChange(index, "typesOfTickets", e)
+                            }
                             required
                         />
                         <Button
@@ -111,11 +110,9 @@ export function ProjectForm({ className }) {
                         <Input
                             type="text"
                             value={step}
-                            onChange={handleArrayChange.bind(
-                                null,
-                                index,
-                                "workflow"
-                            )}
+                            onChange={(e) =>
+                                handleArrayChange(index, "workflow", e)
+                            }
                             required
                         />
                         <Button

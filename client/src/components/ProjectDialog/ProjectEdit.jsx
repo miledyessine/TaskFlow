@@ -18,8 +18,7 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { ProjectForm } from "./ProjectForm";
-
+import { ProjectFormCreate } from "./ProjectFormCreate";
 
 export function ProjectEdit({ open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -35,7 +34,7 @@ export function ProjectEdit({ open, setOpen }) {
                             youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <ProjectForm />
+                    <ProjectFormCreate />
                 </DialogContent>
             </Dialog>
         );
@@ -51,7 +50,7 @@ export function ProjectEdit({ open, setOpen }) {
                         done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <ProjectForm className="px-4" />
+                <ProjectFormCreate className="px-4" />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>
@@ -61,5 +60,3 @@ export function ProjectEdit({ open, setOpen }) {
         </Drawer>
     );
 }
-
-

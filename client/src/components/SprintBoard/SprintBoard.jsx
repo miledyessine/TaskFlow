@@ -14,8 +14,9 @@ import { createPortal } from "react-dom";
 import { Button } from "../ui/button";
 import { TicketPlus } from "lucide-react";
 import { TaskCreate } from "../TaskDialog/TaskCreate";
-import { Link } from "react-router-dom";
-
+import { useParams } from "react-router-dom";
+import { useAxios } from "@/hooks/axioshook";
+import { Skeleton } from "../ui/skeleton";
 const defaultCols = [
     {
         id: "todo",
@@ -28,14 +29,6 @@ const defaultCols = [
     {
         id: "done",
         title: "Done",
-    },
-    {
-        id: "test",
-        title: "Test",
-    },
-    {
-        id: "test1",
-        title: "Test1",
     },
 ];
 
@@ -149,6 +142,7 @@ const defaultTasks = [
 ];
 
 export function SprintBoard() {
+    const { sprint_id } = useParams();
     const [columns, setColumns] = useState(defaultCols);
     const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -158,6 +152,12 @@ export function SprintBoard() {
 
     const [activeTask, setActiveTask] = useState(null);
     const [open, setOpen] = useState(false);
+
+    const sprint = useAxios({
+        method: "GET",
+        url: `/sprints/${sprint_id}`,
+    });
+
     const handleOpenCreateDialog = async () => {
         setOpen(true);
     };
@@ -171,18 +171,29 @@ export function SprintBoard() {
 
     return (
         <div className="md:m-6 m-2">
-            <div className="flex items-center justify-between">
-                
-                    <h3 className="text-2xl font-semibold tracking-tight">
-                        Sprint Name
-                    </h3>
-                
-                <Button variant="outline" onClick={handleOpenCreateDialog}>
-                    <TicketPlus className="h-4 w-4 mr-1" />
-                    <span className="sr-only sm:not-sr-only">Add Task</span>
-                </Button>
-                {open && <TaskCreate open={open} setOpen={setOpen} />}
-            </div>
+            {sprint.loading && (
+                <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-[250px]" />
+                    <Skeleton className="h-6 w-[150px]" />
+                </div>
+            )}
+            {sprint.response && (
+                <div className="flex items-center justify-between">
+                    <div className="flex-col items-end">
+                        <h3 className="text-2xl font-semibold tracking-tight">
+                            {sprint.response.name}
+                        </h3>
+                        <p className="text-base text-gray-500 dark:text-gray-400">
+                            {sprint.response.description}
+                        </p>
+                    </div>
+
+                    <Button variant="outline" onClick={handleOpenCreateDialog}>
+                        <TicketPlus className="h-4 w-4 mr-1" />
+                        <span className="sr-only sm:not-sr-only">Add Task</span>
+                    </Button>
+                </div>
+            )}
             <br />
             <div>
                 <DndContext
@@ -237,6 +248,7 @@ export function SprintBoard() {
                     )}
                 </DndContext>
             </div>
+            {open && <TaskCreate open={open} setOpen={setOpen} />}
         </div>
     );
 

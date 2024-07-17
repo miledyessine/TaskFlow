@@ -2,13 +2,14 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    username: { type: String, required: true, unique: true ,private: true,},
+    _id: { type: String, required: true, unique: true, private: true },
+    username: { type: String, required: true, unique: true, private: true },
     password: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     role: {
         type: String,
         enum: ["admin", "team_leader", "team_member"],
-        required: true,
+        default: "team_member",
     },
 });
 

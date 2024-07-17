@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/drawer";
 import { Bookmark, Orbit, Calendar, CircleUserRound, Flag } from "lucide-react";
 
-export function TaskView({ task, open, setOpen }) {
+export function TaskView({ task,assignee, open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
@@ -47,7 +47,7 @@ export function TaskView({ task, open, setOpen }) {
                                 <h3 className="font-semibold text-gray-700">
                                     Assignee :
                                 </h3>
-                                <p className="text-gray-600">{task.assignee}</p>
+                                <p className="text-gray-600">{assignee.username}</p>
                             </div>
                         </div>
 
@@ -60,7 +60,7 @@ export function TaskView({ task, open, setOpen }) {
                                 <h3 className="font-semibold text-gray-700">
                                     Type Of Ticket :
                                 </h3>
-                                <p className="text-gray-600">Bug</p>
+                                <p className="text-gray-600">{task.typeOfTicket}</p>
                             </div>
                             <div className="flex items-center gap-2 w-full   p-2 rounded-md">
                                 <Flag className="text-red-500" size={18} />
@@ -76,7 +76,10 @@ export function TaskView({ task, open, setOpen }) {
                             <h3 className="font-semibold text-gray-700">
                                 Due Date :
                             </h3>
-                            <p className="text-gray-600">{task.dueDate}</p>
+                            <p className="text-gray-600">{new Date(task.due_date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                    })}</p>
                         </div>
 
                         <div className=" p-2 rounded-md">
@@ -84,12 +87,7 @@ export function TaskView({ task, open, setOpen }) {
                                 Description :
                             </h3>
                             <p className="text-gray-600">
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore magna aliqua. Ut
-                                enim ad minim veniam, quis nostrud exercitation
-                                ullamco laboris nisi ut aliquip ex ea commodo
-                                consequat.
+                                {task.description}
                             </p>
                         </div>
                     </div>

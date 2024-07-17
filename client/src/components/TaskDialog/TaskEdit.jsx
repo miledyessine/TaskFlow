@@ -18,9 +18,9 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { TaskForm } from "./TaskForm";
+import { TaskFormEdit } from "./TaskFormEdit";
 
-export function TaskEdit({ open, setOpen }) {
+export function TaskEdit({ task, assignee, open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
@@ -33,7 +33,7 @@ export function TaskEdit({ open, setOpen }) {
                             Edit your task here. Click save when youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <TaskForm />
+                    <TaskFormEdit task={task} assignee={assignee} />
                 </DialogContent>
             </Dialog>
         );
@@ -41,14 +41,14 @@ export function TaskEdit({ open, setOpen }) {
 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerContent >
+            <DrawerContent>
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Edit task</DrawerTitle>
                     <DrawerDescription>
                         Edit your task here. Click save when youre done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <TaskForm className="px-4" />
+                <TaskFormEdit className="px-4" task={task} assignee={assignee} />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>
