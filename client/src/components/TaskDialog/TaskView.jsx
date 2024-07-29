@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -12,14 +13,13 @@ import {
     Drawer,
     DrawerClose,
     DrawerContent,
-    DrawerDescription,
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
 import { Bookmark, Orbit, Calendar, CircleUserRound, Flag } from "lucide-react";
 
-export function TaskView({ task,assignee, open, setOpen }) {
+export function TaskView({ task, assignee, open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
@@ -29,68 +29,86 @@ export function TaskView({ task,assignee, open, setOpen }) {
                     <DialogHeader>
                         <DialogTitle>{task.name}</DialogTitle>
                     </DialogHeader>
-
-                    <div className="space-y-6 p-4 bg-white rounded-lg shadow-lg">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div className="flex items-center gap-2 w-full   p-2 rounded-md">
-                                <Orbit className="text-blue-500" size={18} />
-                                <h3 className="font-semibold text-gray-700">
-                                    Status :
-                                </h3>
-                                <p className="text-gray-600">{task.status}</p>
+                    <DialogDescription>
+                        <div className="space-y-6 p-4 bg-white rounded-lg shadow-lg">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-2 w-full   p-2 rounded-md">
+                                    <Orbit
+                                        className="text-blue-500"
+                                        size={18}
+                                    />
+                                    <h3 className="font-semibold text-gray-700">
+                                        Status :
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        {task.status}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2 w-full  p-2 rounded-md">
+                                    <CircleUserRound
+                                        className="text-green-500"
+                                        size={18}
+                                    />
+                                    <h3 className="font-semibold text-gray-700">
+                                        Assignee :
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        {assignee.username}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2 w-full  p-2 rounded-md">
-                                <CircleUserRound
-                                    className="text-green-500"
+
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-2 w-full   p-2 rounded-md">
+                                    <Bookmark
+                                        className="text-purple-500"
+                                        size={18}
+                                    />
+                                    <h3 className="font-semibold text-gray-700">
+                                        Type Of Ticket :
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        {task.typeOfTicket}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2 w-full   p-2 rounded-md">
+                                    <Flag className="text-red-500" size={18} />
+                                    <h3 className="font-semibold text-gray-700">
+                                        Priority :
+                                    </h3>
+                                    <p className="text-gray-600">Urgent</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2  p-2 rounded-md">
+                                <Calendar
+                                    className="text-yellow-500"
                                     size={18}
                                 />
                                 <h3 className="font-semibold text-gray-700">
-                                    Assignee :
+                                    Due Date :
                                 </h3>
-                                <p className="text-gray-600">{assignee.username}</p>
+                                <p className="text-gray-600">
+                                    {new Date(task.due_date).toLocaleDateString(
+                                        "en-GB",
+                                        {
+                                            day: "2-digit",
+                                            month: "short",
+                                        }
+                                    )}
+                                </p>
+                            </div>
+
+                            <div className=" p-2 rounded-md">
+                                <h3 className="font-semibold text-gray-700 mb-2">
+                                    Description :
+                                </h3>
+                                <p className="text-gray-600">
+                                    {task.description}
+                                </p>
                             </div>
                         </div>
-
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div className="flex items-center gap-2 w-full   p-2 rounded-md">
-                                <Bookmark
-                                    className="text-purple-500"
-                                    size={18}
-                                />
-                                <h3 className="font-semibold text-gray-700">
-                                    Type Of Ticket :
-                                </h3>
-                                <p className="text-gray-600">{task.typeOfTicket}</p>
-                            </div>
-                            <div className="flex items-center gap-2 w-full   p-2 rounded-md">
-                                <Flag className="text-red-500" size={18} />
-                                <h3 className="font-semibold text-gray-700">
-                                    Priority :
-                                </h3>
-                                <p className="text-gray-600">Urgent</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2  p-2 rounded-md">
-                            <Calendar className="text-yellow-500" size={18} />
-                            <h3 className="font-semibold text-gray-700">
-                                Due Date :
-                            </h3>
-                            <p className="text-gray-600">{new Date(task.due_date).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                    })}</p>
-                        </div>
-
-                        <div className=" p-2 rounded-md">
-                            <h3 className="font-semibold text-gray-700 mb-2">
-                                Description :
-                            </h3>
-                            <p className="text-gray-600">
-                                {task.description}
-                            </p>
-                        </div>
-                    </div>
+                    </DialogDescription>
                 </DialogContent>
             </Dialog>
         );
@@ -101,9 +119,6 @@ export function TaskView({ task,assignee, open, setOpen }) {
             <DrawerContent>
                 <DrawerHeader className="text-left">
                     <DrawerTitle>{task.name}</DrawerTitle>
-                    <DrawerDescription>
-                        Create your task here. Click save when youre done.
-                    </DrawerDescription>
                 </DrawerHeader>
                 <div className="space-y-6 p-4 bg-white rounded-lg shadow-lg">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -155,13 +170,7 @@ export function TaskView({ task,assignee, open, setOpen }) {
                         <h3 className="font-semibold text-gray-700 mb-2">
                             Description :
                         </h3>
-                        <p className="text-gray-600">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit, sed do eiusmod tempor incididunt ut labore et
-                            dolore magna aliqua. Ut enim ad minim veniam, quis
-                            nostrud exercitation ullamco laboris nisi ut aliquip
-                            ex ea commodo consequat.
-                        </p>
+                        <p className="text-gray-600">{task.description}</p>
                     </div>
                 </div>
                 <DrawerFooter className="pt-2">

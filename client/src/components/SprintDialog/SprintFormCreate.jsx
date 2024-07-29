@@ -16,34 +16,36 @@ import {
 import { DatePicker } from "../ui/date-picker";
 
 import { format } from "date-fns";
-export function SprintForm({ className }) {
+import { useAxios } from "@/hooks/axioshook";
+import { useParams } from "react-router-dom";
+export function SprintFormCreate({ className }) {
+    const { project_id } = useParams();
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        duration: "", // Ensure duration starts as an empty string
+        duration: "", 
         start_date: "",
         end_date: "",
+        project_id: project_id,
     });
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         if (id === "duration") {
             if (value !== "custom") {
-                // If duration is not "custom", disable end date and clear its value
                 setFormData((prev) => ({
                     ...prev,
                     [id]: value,
                     end_date: "",
                 }));
             } else {
-                // If duration is "custom", enable end date
+                
                 setFormData((prev) => ({
                     ...prev,
                     [id]: value,
                 }));
             }
         } else {
-            // For other inputs like text and textarea
             setFormData((prev) => ({
                 ...prev,
                 [id]: value,
@@ -67,18 +69,27 @@ export function SprintForm({ className }) {
         }));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(formData); // Form submission logic here
+    const SprintCreation = useAxios();
+    const onSubmit = async () => {
+        const newAxiosParams = {
+            method: "POST",
+            url: "/sprints",
+            data: formData,
+        };
+        await SprintCreation.customFetchData(newAxiosParams).then((data) =>
+            console.log(data)
+        );
     };
 
     return (
         <form
             className={cn("grid items-start gap-4", className)}
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
         >
             <div className="grid gap-2">
-                <Label required htmlFor="name">Name</Label>
+                <Label required htmlFor="name">
+                    Name
+                </Label>
                 <Input
                     type="text"
                     id="name"
@@ -133,7 +144,9 @@ export function SprintForm({ className }) {
                 />
             </div>
             <div className="grid gap-2">
-                <Label required={formData.duration === "custom"}>End Date</Label>
+                <Label required={formData.duration === "custom"}>
+                    End Date
+                </Label>
                 <DatePicker
                     id="end_date"
                     // requiredBtn={formData.duration === "custom"}

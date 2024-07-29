@@ -21,8 +21,30 @@ import { Link } from "react-router-dom";
 
 import { useAuth0 } from "@auth0/auth0-react";
 import { getInitials } from "@/hooks/getInitials";
+import { useAxios } from "@/hooks/axioshook";
+import { useEffect, useState } from "react";
 const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
     const { user } = useAuth0();
+    const [projects, setProjects] = useState();
+    const projectsFetcher = useAxios();
+    const fetchData = () => {
+        projectsFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/projects/`,
+            })
+            .then((projectsResult) => {
+                setProjects(projectsResult.data);
+                console.log(projects);
+            })
+            .catch((error) => {
+                console.error("Error fetching projects data:", error);
+            });
+    };
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     return (
         <div className="overflow-hidden z-40 border-r-1 fixed top-[57px] h-full flex-col justify-between">
             <RPSidebar
@@ -60,7 +82,7 @@ const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
                                 </Link>
                             </Avatar>
                             <Link to="/profile">
-                                <span>Yessine Miled</span>
+                                <span className="pl-1">{user.name}</span>
                             </Link>
                             <Button
                                 variant="transparent"
@@ -92,12 +114,20 @@ const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
                             icon={<FolderOpenDot size={22} />}
                             component={<Link to="/projects" />}
                         >
-                            <MenuItem icon={<FileSpreadsheet size={22} />}>
-                                Project 1
-                            </MenuItem>
-                            <MenuItem icon={<FileSpreadsheet size={22} />}>
-                                Project 2
-                            </MenuItem>
+                            {projects &&
+                                projects.map((project) => (
+                                    <MenuItem
+                                        key={project._id}
+                                        icon={<FileSpreadsheet size={22} />}
+                                        component={
+                                            <Link
+                                                to={`/project/${project._id}`}
+                                            />
+                                        }
+                                    >
+                                        {project.name}
+                                    </MenuItem>
+                                ))}
                         </SubMenu>
                     </Menu>
                 </div>

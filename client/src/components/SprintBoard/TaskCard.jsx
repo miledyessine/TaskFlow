@@ -15,7 +15,7 @@ import {
     Workflow,
     Eye,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { TaskEdit } from "../TaskDialog/TaskEdit";
@@ -23,23 +23,20 @@ import SubtaskCard from "./SubtaskCard";
 import { SubtaskEdit } from "../SubtaskDialog/SubtaskEdit";
 import { SubtaskCreate } from "../SubtaskDialog/SubtaskCreate";
 import { TaskView } from "../TaskDialog/TaskView";
+import { useAxios } from "@/hooks/axioshook";
 
 const priorityColors = {
-    1: "text-red-500",
-    2: "text-orange-500",
-    3: "text-green-500",
+    "Urgent": "text-red-800",
+    "High": "text-red-500",
+    "Normal": "text-orange-500",
+    "Low": "text-green-500",
 };
 
-function TaskCard({ task, deleteTask, updateTask }) {
+function TaskCard({ projectId,task, deleteTask, updateTask }) {
     const [mouseIsOver, setMouseIsOver] = useState(false);
 
-    const [isEditing, setIsEditing] = useState(false);
-
-    const [openDetail, setOpenDetail] = useState(false);
-    const handleSave = (updatedTask) => {
-        updateTask(task.id, updatedTask);
-        setIsEditing(false);
-    };
+    const [userData, setUserData] = useState();
+    
     const [openSubtask, setOpenSubtask] = useState(false);
     const handleOpenSubtask = async () => {
         setOpenSubtask(!openSubtask);
@@ -56,6 +53,25 @@ function TaskCard({ task, deleteTask, updateTask }) {
     const handleOpenCreateSubtaskDialog = async () => {
         setOpenCreateSubtask(true);
     };
+
+    const userFetcher = useAxios();
+    const fetchData = () => {
+        userFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/users/${task.assignee_id}`,
+            })
+            .then((userResult) => {
+                setUserData(userResult.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching user:", error);
+            });
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
     const {
         setNodeRef,
         attributes,
@@ -64,7 +80,7 @@ function TaskCard({ task, deleteTask, updateTask }) {
         transition,
         isDragging,
     } = useSortable({
-        id: task.id,
+        id: task._id,
         data: {
             type: "Task",
             task,
@@ -118,7 +134,7 @@ function TaskCard({ task, deleteTask, updateTask }) {
                         />
                         <Trash2
                             size={16}
-                            onClick={() => deleteTask(task.id)}
+                            onClick={() => deleteTask(task._id)}
                             className="flex items-center justify-center hover:text-red-500 cursor-pointer"
                         />
                     </div>
@@ -134,7 +150,7 @@ function TaskCard({ task, deleteTask, updateTask }) {
                     </span>
                     <h3 className="font-bold text-sm">{task.name}</h3>
                     {/* important change it when consume api to task.subtasks && task.subtasks.length > 0 */}
-                    {!task.subtasks && (
+                    {task.subtasks && (
                         <span
                             onClick={handleOpenSubtask}
                             className="cursor-pointer flex items-center text-xs text-gray-600"
@@ -146,7 +162,7 @@ function TaskCard({ task, deleteTask, updateTask }) {
 
                 <p className="text-gray-700 text-xs">{task.description}</p>
 
-                {!task.subtasks &&
+                {task.subtasks &&
                     // task.subtasks.length > 0 &&
                     (openSubtask ? (
                         <ChevronUp
@@ -170,9 +186,9 @@ function TaskCard({ task, deleteTask, updateTask }) {
                 />
             )}
             {openView && (
-                <TaskView task={task} open={openView} setOpen={setOpenView} />
+                <TaskView assignee={userData} task={task} open={openView} setOpen={setOpenView} />
             )}
-            {openEdit && <TaskEdit open={openEdit} setOpen={setOpenEdit} />}
+            {openEdit && <TaskEdit projectId={projectId} task={task} assignee={userData} open={openEdit} setOpen={setOpenEdit} />}
             {openCreateSubtask && (
                 <SubtaskCreate
                     open={openCreateSubtask}

@@ -18,7 +18,7 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { SprintForm } from "./SprintForm";
+import { SprintFormCreate } from "./SprintFormCreate";
 
 
 export function SprintCreate({ open, setOpen }) {
@@ -35,7 +35,7 @@ export function SprintCreate({ open, setOpen }) {
                             youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <SprintForm />
+                    <SprintFormCreate />
                 </DialogContent>
             </Dialog>
         );
@@ -51,7 +51,7 @@ export function SprintCreate({ open, setOpen }) {
                         done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <SprintForm className="px-4" />
+                <SprintFormCreate className="px-4" />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>

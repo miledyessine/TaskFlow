@@ -33,8 +33,9 @@ export function DroppableTable({ table, tasks }) {
     const { setNodeRef } = useDroppable({
         id: table._id,
     });
+    const isSprint = !!table.start_date;
     return (
-        <Card>
+        <Card ref={setNodeRef}>
             <CardHeader className="px-7">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center justify-between gap-2">
@@ -60,7 +61,9 @@ export function DroppableTable({ table, tasks }) {
                         </CardDescription>
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                        <Button variant="outline">Start Sprint</Button>
+                        {table.start_date && (
+                            <Button variant="outline">Start Sprint</Button>
+                        )}
                         <Button
                             variant="outline"
                             onClick={handleOpenCreateDialog}
@@ -94,7 +97,7 @@ export function DroppableTable({ table, tasks }) {
                         items={tasks}
                         strategy={rectSortingStrategy}
                     >
-                        <TableBody ref={setNodeRef}>
+                        <TableBody>
                             {tasks.length > 0 ? (
                                 tasks.map((task) => (
                                     <SprintRow key={task._id} task={task} />
@@ -108,7 +111,16 @@ export function DroppableTable({ table, tasks }) {
                     </SortableContext>
                 </Table>
             </CardContent>
-            {open && <TaskCreate open={open} setOpen={setOpen} />}
+            {open && (
+                <TaskCreate
+                    {...(isSprint
+                        ? { sprint_id: table._id }
+                        : { backlog_id: table._id })}
+                    open={open}
+                    setOpen={setOpen}
+                    idType={isSprint ? "sprint_id" : "backlog_id"}
+                />
+            )}
         </Card>
     );
 }

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import {  useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,16 +7,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { useAxios } from "@/hooks/axioshook";
-import { useAuth0 } from "@auth0/auth0-react";
+import { Separator } from "../ui/separator";
 
-export function ProjectFormCreate({ className }) {
-    const { user } = useAuth0();
+export function ProjectFormEdit({ project, className }) {
     const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        typesOfTickets: [""],
-        workflow: ["", ""],
-        createdBy: user.sub,
+        name: project.name || "",
+        description: project.description || "",
+        typesOfTickets: project.typesOfTickets || [""],
+        workflow: project.workflow || ["", ""],
     });
     // a refaire
     const handleInputChange = (e) => {
@@ -42,20 +40,30 @@ export function ProjectFormCreate({ className }) {
         setFormData((prev) => ({ ...prev, workflow: [...prev.workflow, ""] }));
     };
 
-    const handleRemoveItem = (index, key,e) => {
+    const handleRemoveItem = (index, key, e) => {
         e.preventDefault();
         const updatedArray = [...formData[key]];
         updatedArray.splice(index, 1);
         setFormData((prev) => ({ ...prev, [key]: updatedArray }));
     };
-    const ProjectCreation = useAxios();
+    const ProjectDelete = useAxios();
+    const deleteProject = () => {
+        const newAxiosParams = {
+            method: "DELETE",
+            url: `/projects/${project._id}`,
+        };
+        ProjectDelete.customFetchData(newAxiosParams).then((data) =>
+            console.log(data)
+        );
+    };
+    const ProjectEdit = useAxios();
     const onSubmit = async () => {
         const newAxiosParams = {
-            method: "POST",
-            url: "/projects",
+            method: "PATCH",
+            url: `/projects/${project._id}`,
             data: formData,
         };
-        await ProjectCreation.customFetchData(newAxiosParams).then((data) =>
+        await ProjectEdit.customFetchData(newAxiosParams).then((data) =>
             console.log(data)
         );
     };
@@ -140,6 +148,10 @@ export function ProjectFormCreate({ className }) {
                     Add Workflow Step
                 </Button>
             </div>
+            <Separator />
+            <Button variant="destructive" onClick={deleteProject}>
+                Delete Project
+            </Button>
             <Button type="submit">Save</Button>
         </form>
     );

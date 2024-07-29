@@ -28,12 +28,9 @@ function SprintRow({ task }) {
         id: task._id,
     });
 
-    const user = useAxios({
-        method: "GET",
-        url: `/users/${task.assignee_id}`,
-    });
-    const [userData,setUserData] = useState();
+    const [userData, setUserData] = useState();
     const [openSubtask, setOpenSubtask] = useState(false);
+    const [subtasks, setSubtasks] = useState([]);
     const [openEdit, setOpenEdit] = useState(false);
     const [openView, setOpenView] = useState(false);
 
@@ -48,8 +45,16 @@ function SprintRow({ task }) {
     const handleOpenViewDialog = () => {
         setOpenView(true);
     };
+    const TaskDelete = useAxios();
 
     const handleDelete = () => {
+        const newAxiosParams = {
+            method: "DELETE",
+            url: `/tasks/${task._id}`,
+        };
+        TaskDelete.customFetchData(newAxiosParams).then((data) =>
+            console.log(data)
+        );
         console.log("delete");
     };
 
@@ -59,11 +64,43 @@ function SprintRow({ task }) {
         opacity: isDragging ? 0.5 : 1,
         border: isDragging ? "1px dashed #aaa" : "none",
     };
-useEffect(() => {
-        if (user.response) {
-            setUserData(user.response);
-        }
-    }, [user.response]);
+    const userFetcher = useAxios();
+    const subTasksFetcher = useAxios();
+    const fetchData = () => {
+        userFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/users/${task.assignee_id}`,
+            })
+            .then((userResult) => {
+                setUserData(userResult.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching user:", error);
+            });
+
+        subTasksFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/tasks/subtasks?task_id=${task._id}`,
+            })
+            .then((subTasksResult) => {
+                if (subTasksResult.data && subTasksResult.data.length > 0) {
+                    setSubtasks(
+                        subTasksResult.data.filter(
+                            (subtask) => subtask.task_id === task._id
+                        ) || []
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching subTasks:", error);
+            });
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
     return (
         <>
             <TableRow
@@ -73,7 +110,7 @@ useEffect(() => {
                 {...listeners}
             >
                 <TableCell className="max-w-full font-medium flex items-center">
-                    {task.subtasks && task.subtasks.length > 0 ? (
+                    {subtasks && subtasks.length > 0 ? (
                         openSubtask ? (
                             <ChevronUp
                                 className="right-0 mr-1 cursor-pointer"
@@ -94,18 +131,20 @@ useEffect(() => {
                         />
                     )}
                     {task.name}
-                    {task.subtasks && task.subtasks.length > 0 && (
+                    {subtasks && subtasks.length > 0 && (
                         <span
                             onClick={handleOpenSubtask}
                             className="ml-2 cursor-pointer flex items-center text-xs text-gray-600"
                         >
                             <Workflow size={13} />
-                            {task.subtasks.length}
+                            {subtasks.length}
                         </span>
                     )}
                 </TableCell>
-                <TableCell>{userData?userData.username:"Loading..."}</TableCell>
-                            
+                <TableCell>
+                    {userData ? userData.username : "Loading..."}
+                </TableCell>
+
                 <TableCell>
                     {new Date(task.due_date).toLocaleDateString("en-GB", {
                         day: "2-digit",
@@ -131,15 +170,17 @@ useEffect(() => {
                     />
                 </TableCell>
             </TableRow>
-            {openSubtask && task.subtasks && (
+            {openSubtask && subtasks && (
                 <>
-                    {task.subtasks.map((subtask) => (
-                        <TableRow key={subtask.id}>
+                    {subtasks.map((subtask) => (
+                        <TableRow key={subtask._id}>
                             <TableCell className=" pl-10 max-w-full font-medium flex items-center">
                                 <Workflow size={14} className="mr-1" />
                                 {subtask.name}
                             </TableCell>
-                            <TableCell>{userData?userData.username:"Loading..."}</TableCell>
+                            <TableCell>
+                                {userData ? userData.username : "Loading..."}
+                            </TableCell>
                             <TableCell>
                                 {new Date(task.due_date).toLocaleDateString(
                                     "en-GB",
@@ -171,9 +212,21 @@ useEffect(() => {
                     ))}
                 </>
             )}
-            {openEdit && <TaskEdit task={task} assignee={userData} open={openEdit} setOpen={setOpenEdit} />}
+            {openEdit && (
+                <TaskEdit
+                    task={task}
+                    assignee={userData}
+                    open={openEdit}
+                    setOpen={setOpenEdit}
+                />
+            )}
             {openView && (
-                <TaskView task={task} assignee={userData} open={openView} setOpen={setOpenView} />
+                <TaskView
+                    task={task}
+                    assignee={userData}
+                    open={openView}
+                    setOpen={setOpenView}
+                />
             )}
         </>
     );

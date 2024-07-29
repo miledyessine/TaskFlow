@@ -63,7 +63,7 @@ const deleteBacklog = async (backlogId) => {
     if (!backlog) {
         throw new ApiError(httpStatus.NOT_FOUND, "Backlog not found");
     }
-    await sprint.remove();
+    await backlog.deleteOne();
     return backlog;
 };
 

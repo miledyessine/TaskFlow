@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     DndContext,
     PointerSensor,
@@ -14,150 +14,77 @@ import { createPortal } from "react-dom";
 import { Button } from "../ui/button";
 import { TicketPlus } from "lucide-react";
 import { TaskCreate } from "../TaskDialog/TaskCreate";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAxios } from "@/hooks/axioshook";
 import { Skeleton } from "../ui/skeleton";
-const defaultCols = [
-    {
-        id: "todo",
-        title: "Todo",
-    },
-    {
-        id: "doing",
-        title: "Work in progress",
-    },
-    {
-        id: "done",
-        title: "Done",
-    },
-];
-
-const defaultTasks = [
-    {
-        id: "1",
-        columnId: "todo",
-        name: "Implement authentication",
-        description: "Implement user authentication using JWT",
-        status: "To Do",
-        priority: 1,
-    },
-    {
-        id: "2",
-        columnId: "todo",
-        name: "Set up database",
-        description: "Set up PostgreSQL database with initial schema",
-        status: "To Do",
-        priority: 2,
-    },
-    {
-        id: "3",
-        columnId: "doing",
-        name: "Create user interface",
-        description:
-            "Design and implement the user interface for the application",
-        status: "In Progress",
-        priority: 3,
-    },
-    {
-        id: "4",
-        columnId: "doing",
-        name: "Configure CI/CD",
-        description: "Set up continuous integration and deployment pipeline",
-        status: "In Progress",
-        priority: 2,
-    },
-    {
-        id: "5",
-        columnId: "done",
-        name: "Develop API endpoints",
-        description: "Create and test all necessary API endpoints",
-        status: "Done",
-        priority: 1,
-    },
-    {
-        id: "6",
-        columnId: "done",
-        name: "Write documentation",
-        description: "Document all features and APIs",
-        status: "Done",
-        priority: 3,
-    },
-    {
-        id: "7",
-        columnId: "todo",
-        name: "Implement unit tests",
-        description: "Write unit tests for all modules",
-        status: "To Do",
-        priority: 1,
-    },
-    {
-        id: "8",
-        columnId: "todo",
-        name: "Optimize performance",
-        description: "Optimize the application for better performance",
-        status: "To Do",
-        priority: 2,
-    },
-    {
-        id: "9",
-        columnId: "todo",
-        name: "Set up logging",
-        description: "Implement logging for all major actions",
-        status: "To Do",
-        priority: 3,
-    },
-    {
-        id: "10",
-        columnId: "todo",
-        name: "Create user roles",
-        description: "Define and implement user roles and permissions",
-        status: "To Do",
-        priority: 1,
-    },
-    {
-        id: "11",
-        columnId: "todo",
-        name: "Integrate third-party services",
-        description:
-            "Integrate third-party services like email and payment gateways",
-        status: "To Do",
-        priority: 2,
-    },
-    {
-        id: "12",
-        columnId: "doing",
-        name: "Code review",
-        description: "Review and refactor existing code",
-        status: "In Progress",
-        priority: 3,
-    },
-    {
-        id: "13",
-        columnId: "doing",
-        name: "Security audit",
-        description: "Conduct a comprehensive security audit",
-        status: "In Progress",
-        priority: 1,
-    },
-];
+import { CardDescription } from "../ui/card";
 
 export function SprintBoard() {
     const { sprint_id } = useParams();
-    const [columns, setColumns] = useState(defaultCols);
-    const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
+    const [columns, setColumns] = useState([]);
 
-    const [tasks, setTasks] = useState(defaultTasks);
+    const [tasks, setTasks] = useState([]);
 
     const [activeColumn, setActiveColumn] = useState(null);
 
     const [activeTask, setActiveTask] = useState(null);
     const [open, setOpen] = useState(false);
+    const [statusCol, setStatusCol] = useState(false);
 
-    const sprint = useAxios({
-        method: "GET",
-        url: `/sprints/${sprint_id}`,
-    });
+    const [project, setProject] = useState();
+    const projectFetcher = useAxios();
+    const sprintFetcher = useAxios();
+    const tasksFetcher = useAxios();
+    const TaskTransfer = useAxios();
+    const TaskDelete = useAxios();
+    const [sprint, setSprint] = useState();
+    const fetchData = () => {
+        sprintFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/sprints/${sprint_id}`,
+            })
+            .then((sprintResult) => {
+                setSprint(sprintResult.data);
+                projectFetcher
+                    .customFetchData({
+                        method: "GET",
+                        url: `/projects/${sprintResult.data.project_id}`,
+                    })
+                    .then((projectResult) => {
+                        setProject(projectResult.data);
+                        return projectResult.data;
+                    })
+                    .then((workflowResult) => {
+                        setColumns(workflowResult.workflow);
+                        console.log("herre", workflowResult.workflow);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching project data:", error);
+                    });
+            })
+            .catch((error) => {
+                console.error("Error fetching sprint data:", error);
+            });
 
+        tasksFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/tasks?sprint_id=${sprint_id}`,
+            })
+            .then((tasksResult) => {
+                setTasks(tasksResult.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching tasks:", error);
+            });
+    };
+    useEffect(() => {
+        fetchData();
+    }, []);
+    const columnsIds = useMemo(() => {
+        return columns.map((col) => col);
+    }, [columns]);
     const handleOpenCreateDialog = async () => {
         setOpen(true);
     };
@@ -171,20 +98,47 @@ export function SprintBoard() {
 
     return (
         <div className="md:m-6 m-2">
-            {sprint.loading && (
+            {sprintFetcher.fetchHandler.loading && (
                 <div className="flex items-center justify-between">
                     <Skeleton className="h-5 w-[250px]" />
                     <Skeleton className="h-6 w-[150px]" />
                 </div>
             )}
-            {sprint.response && (
+            {sprint && (
                 <div className="flex items-center justify-between">
                     <div className="flex-col items-end">
-                        <h3 className="text-2xl font-semibold tracking-tight">
-                            {sprint.response.name}
-                        </h3>
+                        <div className="flex items-center justify-between gap-2">
+                            <h3 className="text-2xl font-semibold tracking-tight">
+                                {project && (
+                                    <Link to={`/project/${project._id}`}>
+                                        {project.name}/
+                                    </Link>
+                                )}{" "}
+                                {sprint.name}
+                            </h3>
+                            {sprint.start_date && (
+                                <CardDescription>
+                                    {new Date(
+                                        sprint.start_date
+                                    ).toLocaleDateString("en-GB", {
+                                        day: "2-digit",
+                                        month: "short",
+                                    })}{" "}
+                                    -{" "}
+                                    {new Date(
+                                        sprint.end_date
+                                    ).toLocaleDateString("en-GB", {
+                                        day: "2-digit",
+                                        month: "short",
+                                    })}
+                                </CardDescription>
+                            )}
+                            <CardDescription className="text-xs text-gray-400">
+                                ({tasks ? tasks.length : "0"} tickets)
+                            </CardDescription>{" "}
+                        </div>
                         <p className="text-base text-gray-500 dark:text-gray-400">
-                            {sprint.response.description}
+                            {sprint.description}
                         </p>
                     </div>
 
@@ -196,111 +150,102 @@ export function SprintBoard() {
             )}
             <br />
             <div>
-                <DndContext
-                    sensors={sensors}
-                    onDragStart={onDragStart}
-                    onDragEnd={onDragEnd}
-                    onDragOver={onDragOver}
-                >
-                    <div className="flex flex-row justify-around gap-4">
-                        <SortableContext items={columnsId}>
-                            {columns.map((col) => (
-                                <ColumnContainer
-                                    key={col.id}
-                                    column={col}
-                                    deleteColumn={deleteColumn}
-                                    updateColumn={updateColumn}
-                                    createTask={createTask}
-                                    deleteTask={deleteTask}
-                                    updateTask={updateTask}
-                                    tasks={tasks.filter(
-                                        (task) => task.columnId === col.id
-                                    )}
-                                />
-                            ))}
-                        </SortableContext>
-                    </div>
-                    {createPortal(
-                        <DragOverlay>
-                            {activeColumn && (
-                                <ColumnContainer
-                                    column={activeColumn}
-                                    deleteColumn={deleteColumn}
-                                    updateColumn={updateColumn}
-                                    createTask={createTask}
-                                    deleteTask={deleteTask}
-                                    updateTask={updateTask}
-                                    tasks={tasks.filter(
-                                        (task) =>
-                                            task.columnId === activeColumn.id
-                                    )}
-                                />
-                            )}
-                            {activeTask && (
-                                <TaskCard
-                                    task={activeTask}
-                                    deleteTask={deleteTask}
-                                    updateTask={updateTask}
-                                />
-                            )}
-                        </DragOverlay>,
-                        document.body
-                    )}
-                </DndContext>
+                {columns?.length > 0 && tasks?.length > 0 && (
+                    <DndContext
+                        sensors={sensors}
+                        onDragStart={onDragStart}
+                        onDragEnd={onDragEnd}
+                        onDragOver={onDragOver}
+                    >
+                        <div className="flex flex-row justify-around gap-4">
+                            <SortableContext items={columnsIds}>
+                                {columns?.length > 0 &&
+                                    tasks?.length > 0 &&
+                                    columns.map((col) => (
+                                        <ColumnContainer
+                                            key={col}
+                                            column={col}
+                                            projectId={project._id}
+                                            createTask={createTask}
+                                            deleteTask={deleteTask}
+                                            updateTask={updateTask}
+                                            tasks={tasks.filter(
+                                                (task) => task.status === col
+                                            )}
+                                        />
+                                    ))}
+                            </SortableContext>
+                        </div>
+                        {createPortal(
+                            <DragOverlay>
+                                {activeColumn && (
+                                    <ColumnContainer
+                                        column={activeColumn}
+                                        createTask={createTask}
+                                        deleteTask={deleteTask}
+                                        updateTask={updateTask}
+                                        tasks={tasks.filter(
+                                            (task) =>
+                                                task.status === activeColumn._id
+                                        )}
+                                    />
+                                )}
+                                {activeTask && (
+                                    <TaskCard
+                                        projectId={project._id}
+                                        task={activeTask}
+                                        deleteTask={deleteTask}
+                                        updateTask={updateTask}
+                                    />
+                                )}
+                            </DragOverlay>,
+                            document.body
+                        )}
+                    </DndContext>
+                )}
             </div>
-            {open && <TaskCreate open={open} setOpen={setOpen} />}
+            {open && (
+                <TaskCreate
+                    sprint_id={sprint._id}
+                    open={open}
+                    setOpen={setOpen}
+                    idType="sprint_id"
+                    projectId={project._id}
+                    statusCol={statusCol}
+                />
+            )}
         </div>
     );
 
-    function createTask(columnId) {
-        const newTask = {
-            id: generateId(),
-            columnId,
-            content: `Task ${tasks.length + 1}`,
-        };
-
-        setTasks([...tasks, newTask]);
+    function createTask(status) {
+        setStatusCol(status);
+        setOpen(true);
     }
 
     function deleteTask(id) {
-        const newTasks = tasks.filter((task) => task.id !== id);
+        const newAxiosParams = {
+            method: "DELETE",
+            url: `/tasks/${id}`,
+        };
+        TaskDelete.customFetchData(newAxiosParams).then((data) =>
+            console.log(data)
+        );
+        console.log("delete");
+        const newTasks = tasks.filter((task) => task._id !== id);
         setTasks(newTasks);
     }
 
     function updateTask(id, content) {
         const newTasks = tasks.map((task) => {
-            if (task.id !== id) return task;
+            if (task._id !== id) return task;
             return { ...task, content };
         });
 
         setTasks(newTasks);
     }
 
-    // function createNewColumn() {
-    //     const columnToAdd = {
-    //         id: generateId(),
-    //         title: `Column ${columns.length + 1}`,
-    //     };
 
-    //     setColumns([...columns, columnToAdd]);
-    // }
-
-    function deleteColumn(id) {
-        const filteredColumns = columns.filter((col) => col.id !== id);
-        setColumns(filteredColumns);
-
-        const newTasks = tasks.filter((t) => t.columnId !== id);
-        setTasks(newTasks);
-    }
-
-    function updateColumn(id, title) {
-        const newColumns = columns.map((col) => {
-            if (col.id !== id) return col;
-            return { ...col, title };
-        });
-
-        setColumns(newColumns);
-    }
+    
 
     function onDragStart(event) {
         if (event.active.data.current?.type === "Column") {
@@ -323,24 +268,19 @@ export function SprintBoard() {
 
         const activeId = active.id;
         const overId = over.id;
-
+        console.log("object", overId);
         if (activeId === overId) return;
 
-        const isActiveAColumn = active.data.current?.type === "Column";
-        if (!isActiveAColumn) return;
-
-        console.log("DRAG END");
-
-        setColumns((columns) => {
-            const activeColumnIndex = columns.findIndex(
-                (col) => col.id === activeId
-            );
-            const overColumnIndex = columns.findIndex(
-                (col) => col.id === overId
-            );
-
-            return arrayMove(columns, activeColumnIndex, overColumnIndex);
-        });
+        const newAxiosParams = {
+            method: "PATCH",
+            url: `/tasks/${activeId}`,
+            data: {
+                status: overId,
+            },
+        };
+        TaskTransfer.customFetchData(newAxiosParams).then((data) =>
+            console.log(data)
+        );
     }
 
     function onDragOver(event) {
@@ -360,12 +300,12 @@ export function SprintBoard() {
         // Im dropping a Task over another Task
         if (isActiveATask && isOverATask) {
             setTasks((tasks) => {
-                const activeIndex = tasks.findIndex((t) => t.id === activeId);
-                const overIndex = tasks.findIndex((t) => t.id === overId);
+                const activeIndex = tasks.findIndex((t) => t._id === activeId);
+                const overIndex = tasks.findIndex((t) => t._id === overId);
 
-                if (tasks[activeIndex].columnId !== tasks[overIndex].columnId) {
+                if (tasks[activeIndex].status !== tasks[overIndex].status) {
                     // Fix introduced after video recording
-                    tasks[activeIndex].columnId = tasks[overIndex].columnId;
+                    tasks[activeIndex].status = tasks[overIndex].status;
                     return arrayMove(tasks, activeIndex, overIndex - 1);
                 }
 
@@ -378,16 +318,12 @@ export function SprintBoard() {
         // Im dropping a Task over a column
         if (isActiveATask && isOverAColumn) {
             setTasks((tasks) => {
-                const activeIndex = tasks.findIndex((t) => t.id === activeId);
+                const activeIndex = tasks.findIndex((t) => t._id === activeId);
 
-                tasks[activeIndex].columnId = overId;
+                tasks[activeIndex].status = overId;
                 console.log("DROPPING TASK OVER COLUMN", { activeIndex });
                 return arrayMove(tasks, activeIndex, activeIndex);
             });
         }
     }
-}
-function generateId() {
-    /* Generate a random number between 0 and 10000 */
-    return Math.floor(Math.random() * 10001);
 }

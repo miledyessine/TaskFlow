@@ -1,28 +1,35 @@
-import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { useState, useCallback } from "react";
+import axios from "axios";
 
-axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.baseURL = "http://localhost:3000";
 
-export const useAxios = (axiosParams) => {
-    const [state, setState] = useState({
+export const useAxios = () => {
+    const [fetchHandler, setFetchHandler] = useState({
         response: undefined,
-        error: '',
+        error: "",
         loading: true,
     });
 
-    const fetchData = useCallback(async (params) => {
-        setState({ response: undefined, error: '', loading: true });
+    const customFetchData = useCallback(async (params) => {
+        setFetchHandler({ response: undefined, error: "", loading: true });
         try {
             const result = await axios.request(params);
-            setState({ response: result.data, error: '', loading: false });
+            setFetchHandler({
+                response: result.data,
+                error: "",
+                loading: false,
+            });
+
+            return result;
         } catch (error) {
-            setState({ response: undefined, error: error.message, loading: false });
+            console.error("Axios error:", error);
+            setFetchHandler({
+                response: undefined,
+                error: error.message,
+                loading: false,
+            });
         }
     }, []);
 
-    useEffect(() => {
-        fetchData(axiosParams);
-    }, []);
-
-    return state;
+    return { fetchHandler, customFetchData };
 };

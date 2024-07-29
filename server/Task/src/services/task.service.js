@@ -26,11 +26,10 @@ const updateTask = async (taskId, updateBody) => {
     const task = await getTask(taskId);
     if (!task) {
         throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
-    } else if (!toDest) {
-        Object.assign(task, updateBody);
-        await task.save();
-        return task;
     }
+    Object.assign(task, updateBody);
+    await task.save();
+    return task;
 };
 
 const deleteTask = async (taskId) => {
@@ -38,12 +37,12 @@ const deleteTask = async (taskId) => {
     if (!task) {
         throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
     }
-    await task.remove();
+    await task.deleteOne();
     return task;
 };
 
 const transferTaskToSprint = async (taskId, sprintId) => {
-    const task = await Task.findById(taskId);
+    const task = await getTask(taskId);
     if (!task) {
         throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
     }
@@ -60,7 +59,7 @@ const transferTaskToSprint = async (taskId, sprintId) => {
 };
 
 const transferTaskToBacklog = async (taskId, backlogId) => {
-    const task = await Task.findById(taskId);
+    const task = await getTask(taskId);
     if (!task) {
         throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
     }
@@ -111,7 +110,7 @@ const deleteSubtask = async (subtaskId) => {
     if (!subtask) {
         throw new ApiError(httpStatus.NOT_FOUND, "Subtask not found");
     }
-    await subtask.remove();
+    await subtask.deleteOne();
     return subtask;
 };
 

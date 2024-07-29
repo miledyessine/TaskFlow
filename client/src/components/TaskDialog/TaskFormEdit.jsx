@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,17 +16,57 @@ import {
 import { DatePicker } from "../ui/date-picker";
 
 import { format } from "date-fns";
-export function TaskFormEdit({ task,assignee,className }) {
+import { useParams } from "react-router-dom";
+import { useAxios } from "@/hooks/axioshook";
+export function TaskFormEdit({projectId, task, assignee, className }) {
     const [formData, setFormData] = useState({
-        name: task.name ||"",
-        description: task.description ||"",
-        status: task.status ||"",
-        typeOfTicket: task.typeOfTicket ||"",
-        priority: task.priority ||"",
-        assignee: assignee._id ||"",
-        due_date: format(task.due_date, "MM/dd/yyyy") ||"",
+        name: task.name || "",
+        description: task.description || "",
+        status: task.status || "",
+        typeOfTicket: task.typeOfTicket || "",
+        priority: task.priority || "",
+        assignee_id: assignee._id || "",
+        due_date: format(task.due_date, "MM/dd/yyyy") || "",
     });
-console.log(formData);
+
+    const { project_id } = useParams();
+    const url = project_id ? `/projects/${project_id}` : `/projects/${projectId}`;
+    
+    const [project, setProject] = useState(null);
+    const [users, setUsers] = useState([]);
+    const projectFetcher = useAxios();
+    const usersFetcher = useAxios();
+
+    const fetchData = () => {
+        projectFetcher
+            .customFetchData({
+                method: "GET",
+                url: url,
+            })
+            .then((projectResult) => {
+                setProject((prev) => ({ ...prev, ...projectResult.data }));
+            })
+            .catch((error) => {
+                console.error("Error fetching project:", error);
+            });
+
+        usersFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/users`,
+            })
+            .then((usersResult) => {
+                setUsers(usersResult.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching users:", error);
+            });
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [project_id,projectId]);
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setFormData((prev) => ({ ...prev, [id]: value }));
@@ -40,12 +80,21 @@ console.log(formData);
         }));
     };
 
-    const handleSubmit = (e) => {
+    const TaskEdit = useAxios();
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData); // Form submission logic here
+        const newAxiosParams = {
+            method: "PATCH",
+            url: `/tasks/${task._id}`,
+            data: formData,
+        };
+        await TaskEdit.customFetchData(newAxiosParams).then((data) =>
+            console.log(data)
+        );
     };
 
     return (
+        
         <form
             className={cn("grid items-start gap-4", className)}
             onSubmit={handleSubmit}
@@ -75,7 +124,6 @@ console.log(formData);
                     <Label required>Type Of Ticket</Label>
                     <Select
                         id="typeOfTicket"
-                        required
                         onValueChange={(selectedOption) => {
                             handleInputChange({
                                 target: {
@@ -86,12 +134,21 @@ console.log(formData);
                         }}
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder={formData.typeOfTicket||"Select a type"} />
+                            <SelectValue
+                                placeholder={
+                                    formData.typeOfTicket || "Select a type"
+                                }
+                            />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="bug">Bug</SelectItem>
-                                <SelectItem value="task">Task</SelectItem>
+                                {project &&
+                                    project.typesOfTickets.map((type) => (
+                                        <SelectItem key={type} value={type}>
+                                            {type.charAt(0).toUpperCase() +
+                                                type.slice(1)}
+                                        </SelectItem>
+                                    ))}
                             </SelectGroup>
                         </SelectContent>
                     </Select>
@@ -100,7 +157,6 @@ console.log(formData);
                     <Label required>Priority</Label>
                     <Select
                         id="priority"
-                        required
                         onValueChange={(selectedOption) => {
                             handleInputChange({
                                 target: {
@@ -111,79 +167,103 @@ console.log(formData);
                         }}
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder={formData.priority||"Select a priority"} />
+                            <SelectValue
+                                placeholder={
+                                    formData.priority || "Select a priority"
+                                }
+                            />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="urgent">Urgent</SelectItem>
-                                <SelectItem value="high">High</SelectItem>
-                                <SelectItem value="normal">Normal</SelectItem>
-                                <SelectItem value="low">Low</SelectItem>
+                                <SelectItem value="Urgent">Urgent</SelectItem>
+                                <SelectItem value="High">High</SelectItem>
+                                <SelectItem value="Normal">Normal</SelectItem>
+                                <SelectItem value="Low">Low</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
                 </div>
             </div>
             <div className="flex items-center justify-between gap-3">
-            <div className="grid gap-2 w-full">
-                <Label required>Status</Label>
-                <Select
-                    id="status"
-                    required
-                    onValueChange={(selectedOption) => {
-                        handleInputChange({
-                            target: {
-                                id: "status",
-                                value: selectedOption,
-                            },
-                        });
-                    }}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder={formData.status||"Select a status"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectItem value="todo">To Do</SelectItem>
-                            <SelectItem value="inProgress">
-                                In Progress
-                            </SelectItem>
-                            <SelectItem value="done">Done</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-            </div><div className="grid gap-2 w-full">
-                <Label required>Assignee</Label>
-                <Select
-                    id="assignee"
-                    required
-                    onValueChange={(selectedOption) => {
-                        handleInputChange({
-                            target: {
-                                id: "assignee",
-                                value: selectedOption,
-                            },
-                        });
-                    }}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder={assignee.username||"Select an assignee"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectItem value="yessine">Yessine</SelectItem>
-                            <SelectItem value="miled">Miled</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
+                <div className="grid gap-2 w-full">
+                    <Label required>Status</Label>
+                    <Select
+                        id="status"
+                        onValueChange={(selectedOption) => {
+                            handleInputChange({
+                                target: {
+                                    id: "status",
+                                    value: selectedOption,
+                                },
+                            });
+                        }}
+                    >
+                        <SelectTrigger>
+                            <SelectValue
+                                placeholder={
+                                    formData.status || "Select a status"
+                                }
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                {project &&
+                                    project.workflow.map((status) => (
+                                        <SelectItem key={status} value={status}>
+                                            {status.charAt(0).toUpperCase() +
+                                                status.slice(1)}
+                                        </SelectItem>
+                                    ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="grid gap-2 w-full">
+                    <Label required>Assignee</Label>
+                    <Select
+                        value={formData.assignee_id}
+                        id="assignee_id"
+                        onValueChange={(selectedOption) => {
+                            handleInputChange({
+                                target: {
+                                    id: "assignee_id",
+                                    value: selectedOption,
+                                },
+                            });
+                        }}
+                    >
+                        <SelectTrigger>
+                            <SelectValue
+                                placeholder={
+                                    assignee.username || "Select an assignee"
+                                }
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                {users &&
+                                    users.map((user) => (
+                                        <SelectItem
+                                            key={user._id}
+                                            value={user._id}
+                                        >
+                                            {user.username}
+                                        </SelectItem>
+                                    ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
-            </div>
-            
+
             <div className="grid gap-2">
                 <Label>Due Date</Label>
-                <DatePicker id="due_date" datePlaceholder={formData.due_date} onSelect={handleDueDateSelect} />
+                <DatePicker
+                    id="due_date"
+                    datePlaceholder={formData.due_date}
+                    onSelect={handleDueDateSelect}
+                />
             </div>
-            
 
             <Button type="submit">Save</Button>
         </form>

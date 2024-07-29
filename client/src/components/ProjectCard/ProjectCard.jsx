@@ -13,19 +13,19 @@ import { Badge } from "../ui/badge";
 import { useState } from "react";
 import { ProjectEdit } from "../ProjectDialog/ProjectEdit";
 import { Link } from "react-router-dom";
-function ProjectCard({ id,title, description, createdBy }) {
+function ProjectCard({ project, createdBy }) {
     const [open, setOpen] = useState(false);
-
+    const { name, description } = project;
+    const id = project._id;
     const handleOpenEditDialog = async () => {
         setOpen(true);
     };
     return (
-        <div>
             <Card>
                 <CardHeader>
                     <CardTitle className="flex justify-between items-center">
                         <Link to={`/project/${id}`}>
-                            <span>{title}</span>
+                            <span>{name}</span>
                         </Link>
                         <Button
                             variant="icon"
@@ -40,16 +40,16 @@ function ProjectCard({ id,title, description, createdBy }) {
                     <CardContent>
                         <CardDescription>{description}</CardDescription>
                     </CardContent>
-                    <CardFooter className="text-xs justify-end text-right ">
+                    <CardFooter className="text-xs flex justify-end text-right ">
                         <Badge className="gap-0.5">
                             <Crown size={13} />
                             {createdBy}
                         </Badge>
                     </CardFooter>
-                </Link>
+                </Link>{open && <ProjectEdit project={project} open={open} setOpen={setOpen} />}
             </Card>
-            {open && <ProjectEdit open={open} setOpen={setOpen} />}
-        </div>
+            
+        
     );
 }
 

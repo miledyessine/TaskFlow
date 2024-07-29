@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import  { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,18 +14,59 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "../ui/date-picker";
-
 import { format } from "date-fns";
-export function TaskFormCreate({ className }) {
+import { useAxios } from "@/hooks/axioshook";
+import { useParams } from "react-router-dom";
+
+export function TaskFormCreate({ projectId,statusCol,table_id, idType, className }) {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        status: "",
+        status: statusCol||"",
         typeOfTicket: "",
         priority: "",
-        assignee: "",
+        assignee_id: "",
         due_date: "",
+        [idType]: table_id,
     });
+
+    const { project_id } = useParams();
+    const url = project_id ? `/projects/${project_id}` : `/projects/${projectId}`;
+    const [project, setProject] = useState(null);
+    const [users, setUsers] = useState([]);
+    const projectFetcher = useAxios();
+    const usersFetcher = useAxios();
+
+    const fetchData = () => {
+        projectFetcher
+            .customFetchData({
+                method: "GET",
+                url: url,
+            })
+            .then((projectResult) => {
+                setProject((prev) => ({ ...prev, ...projectResult.data }));
+            })
+            .catch((error) => {
+                console.error("Error fetching project:", error);
+            });
+
+        usersFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/users`,
+            })
+            .then((usersResult) => {
+                setUsers(usersResult.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching users:", error);
+            });
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [project_id,projectId]);
+
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         setFormData((prev) => ({ ...prev, [id]: value }));
@@ -39,20 +80,23 @@ export function TaskFormCreate({ className }) {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const TaskCreation = useAxios();
+    const onSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData); // Form submission logic here
+        const newAxiosParams = {
+            method: "POST",
+            url: "/tasks",
+            data: formData,
+        };
+        await TaskCreation.customFetchData(newAxiosParams).then((data) =>
+            console.log(data)
+        );
     };
 
     return (
-        <form
-            className={cn("grid items-start gap-4", className)}
-            onSubmit={handleSubmit}
-        >
+        <form className={cn("grid items-start gap-4", className)} onSubmit={onSubmit}>
             <div className="grid gap-2">
-                <Label required htmlFor="name">
-                    Name
-                </Label>
+                <Label required htmlFor="name">Name</Label>
                 <Input
                     type="text"
                     id="name"
@@ -73,7 +117,7 @@ export function TaskFormCreate({ className }) {
                 <div className="grid gap-2 w-full">
                     <Label required>Type Of Ticket</Label>
                     <Select
-                        value={formData.duration}
+                        value={formData.typeOfTicket}
                         id="typeOfTicket"
                         required
                         onValueChange={(selectedOption) => {
@@ -90,8 +134,12 @@ export function TaskFormCreate({ className }) {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="bug">Bug</SelectItem>
-                                <SelectItem value="task">Task</SelectItem>
+                                {project &&
+                                    project.typesOfTickets.map((type) => (
+                                        <SelectItem key={type} value={type}>
+                                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                                        </SelectItem>
+                                    ))}
                             </SelectGroup>
                         </SelectContent>
                     </Select>
@@ -99,7 +147,7 @@ export function TaskFormCreate({ className }) {
                 <div className="grid gap-2 w-full">
                     <Label required>Priority</Label>
                     <Select
-                        value={formData.duration}
+                        value={formData.priority}
                         id="priority"
                         required
                         onValueChange={(selectedOption) => {
@@ -110,84 +158,87 @@ export function TaskFormCreate({ className }) {
                                 },
                             });
                         }}
-                    >
+                    > 
                         <SelectTrigger>
                             <SelectValue placeholder="Select a priority" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
-                                <SelectItem value="urgent">Urgent</SelectItem>
-                                <SelectItem value="high">High</SelectItem>
-                                <SelectItem value="normal">Normal</SelectItem>
-                                <SelectItem value="low">Low</SelectItem>
+                                <SelectItem value="Urgent">Urgent</SelectItem>
+                                <SelectItem value="High">High</SelectItem>
+                                <SelectItem value="Normal">Normal</SelectItem>
+                                <SelectItem value="Low">Low</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>
                 </div>
             </div>
             <div className="flex items-center justify-between gap-3">
-            <div className="grid gap-2 w-full">
-                <Label required>Status</Label>
-                <Select
-                    value={formData.duration}
-                    id="status"
-                    required
-                    onValueChange={(selectedOption) => {
-                        handleInputChange({
-                            target: {
-                                id: "status",
-                                value: selectedOption,
-                            },
-                        });
-                    }}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectItem value="todo">To Do</SelectItem>
-                            <SelectItem value="inProgress">
-                                In Progress
-                            </SelectItem>
-                            <SelectItem value="done">Done</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-            </div><div className="grid gap-2 w-full">
-                <Label required>Assignee</Label>
-                <Select
-                    value={formData.duration}
-                    id="assignee"
-                    required
-                    onValueChange={(selectedOption) => {
-                        handleInputChange({
-                            target: {
-                                id: "assignee",
-                                value: selectedOption,
-                            },
-                        });
-                    }}
-                >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select an assignee" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectItem value="yessine">Yessine</SelectItem>
-                            <SelectItem value="miled">Miled</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
+                <div className="grid gap-2 w-full">
+                    <Label required>Status</Label>
+                    <Select
+                        value={formData.status}
+                        id="status"
+                        required
+                        onValueChange={(selectedOption) => {
+                            handleInputChange({
+                                target: {
+                                    id: "status",
+                                    value: selectedOption,
+                                },
+                            });
+                        }}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                {project &&
+                                    project.workflow.map((status) => (
+                                        <SelectItem key={status} value={status}>
+                                            {status.charAt(0).toUpperCase() + status.slice(1)}
+                                        </SelectItem>
+                                    ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="grid gap-2 w-full">
+                    <Label required>Assignee</Label>
+                    <Select
+                        value={formData.assignee_id}
+                        id="assignee_id"
+                        required
+                        onValueChange={(selectedOption) => {
+                            handleInputChange({
+                                target: {
+                                    id: "assignee_id",
+                                    value: selectedOption,
+                                },
+                            });
+                        }}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select an assignee" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                {users &&
+                                    users.map((user) => (
+                                        <SelectItem key={user._id} value={user._id}>
+                                            {user.username}
+                                        </SelectItem>
+                                    ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
-            </div>
-            
             <div className="grid gap-2">
                 <Label>Due Date</Label>
                 <DatePicker id="due_date" onSelect={handleDueDateSelect} />
             </div>
-            
-
             <Button type="submit">Save</Button>
         </form>
     );

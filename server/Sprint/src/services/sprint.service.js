@@ -43,7 +43,7 @@ const deleteSprint = async (sprintId) => {
     if (!sprint) {
         throw new ApiError(httpStatus.NOT_FOUND, "Sprint not found");
     }
-    await sprint.remove();
+    await sprint.deleteOne();
     return sprint;
 };
 

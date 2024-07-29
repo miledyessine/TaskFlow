@@ -18,9 +18,10 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { ProjectFormEdit } from "./ProjectFormEdit";
+import { BacklogFormCreate } from "./BacklogFormCreate";
 
-export function ProjectEdit({project, open, setOpen }) {
+
+export function BacklogCreate({ open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
@@ -28,13 +29,13 @@ export function ProjectEdit({project, open, setOpen }) {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Edit project </DialogTitle>
+                        <DialogTitle>Create backlog </DialogTitle>
                         <DialogDescription>
-                            Make changes to your project here. Click save when
+                            Create your backlog here. Click save when
                             youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <ProjectFormEdit project={project} />
+                    <BacklogFormCreate />
                 </DialogContent>
             </Dialog>
         );
@@ -44,13 +45,13 @@ export function ProjectEdit({project, open, setOpen }) {
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerContent>
                 <DrawerHeader className="text-left">
-                    <DrawerTitle>Edit project</DrawerTitle>
+                    <DrawerTitle>Create backlog</DrawerTitle>
                     <DrawerDescription>
-                        Make changes to your project here. Click save when youre
+                        Create your backlog here. Click save when youre
                         done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <ProjectFormEdit project={project} className="px-4" />
+                <BacklogFormCreate className="px-4" />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>
@@ -60,3 +61,5 @@ export function ProjectEdit({project, open, setOpen }) {
         </Drawer>
     );
 }
+
+

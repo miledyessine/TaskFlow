@@ -10,7 +10,7 @@ const projectSchema = new Schema({
         type: String
     },
     createdBy: {
-        type: Schema.Types.ObjectId,
+        type: String,
         required: true
     },
     createdAt: {

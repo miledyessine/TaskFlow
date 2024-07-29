@@ -5,14 +5,13 @@ module.exports = {
         type: "object",
         properties: {
             username: { type: "string" },
-            password: { type: "string" },
             email: { type: "string" },
             role: {
-                type: "string",
+                type: ["string"],
                 enum: ["admin", "team_leader", "team_member"],
             },
         },
-        required: ["username", "password", "email", "role"],
+        required: ["_id","username",  "email", "role"],
     },
     Project: {
         type: "object",

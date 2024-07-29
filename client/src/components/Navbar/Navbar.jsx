@@ -1,22 +1,16 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { ListTodo } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Link } from "react-router-dom";
-import { useTheme } from "@/components/ThemeProvider";
+import useNavbar from "./useNavbar";
 export function Navbar() {
-    const { setTheme } = useTheme();
-    const { loginWithRedirect, isAuthenticated, logout } = useAuth0();
-    const handleSignup = async () => {
-        await loginWithRedirect({
-            authorizationParams: { screen_hint: "signup" },
-        });
-    };
+    const { isAuthenticated } = useAuth0();
 
-    const handleLogin = async () => {
-        await loginWithRedirect();
-    };
+    const { handleSignup, handleLogin, handleLogout } = useNavbar();
+
     return (
         <div className="fixed z-50 h-[57px] w-full bg-white border-b flex items-center justify-between px-5 md:px-16">
             <div className="flex items-center">
@@ -55,7 +49,7 @@ export function Navbar() {
                 </Tabs>
             )}
             {isAuthenticated && (
-                <Button variant="destructive" onClick={logout}>
+                <Button variant="destructive" onClick={handleLogout}>
                     Log out
                 </Button>
             )}

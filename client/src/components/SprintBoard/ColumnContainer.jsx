@@ -1,86 +1,49 @@
 /* eslint-disable react/prop-types */
 import { useMemo, useState } from "react";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
 import TaskCard from "./TaskCard";
-import { BadgeX, TicketPlus, Trash2 } from "lucide-react";
+import { TicketPlus } from "lucide-react";
 import { Button } from "../ui/button";
-import { TaskCreate } from "../TaskDialog/TaskCreate";
 
 function ColumnContainer({
+    projectId,
     column,
-    deleteColumn,
     createTask,
     tasks,
     deleteTask,
     updateTask,
 }) {
     const tasksIds = useMemo(() => {
-        return tasks.map((task) => task.id);
+        return tasks.map((task) => task._id);
     }, [tasks]);
-
-    const [open, setOpen] = useState(false);
+    const [, setOpen] = useState(false);
     const handleOpenCreateDialog = async () => {
         setOpen(true);
-        createTask(column.id);
+        createTask(column);
     };
-    const {
-        setNodeRef,
-        attributes,
-        listeners,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({
-        id: column.id,
+    const { setNodeRef } = useSortable({
+        id: column,
         data: {
             type: "Column",
             column,
         },
     });
 
-    const style = {
-        transition,
-        transform: CSS.Transform.toString(transform),
-    };
-
-    if (isDragging) {
-        return (
-            <div
-                ref={setNodeRef}
-                style={style}
-                className="bg-gray-700 opacity-40 w-full h-[500px] max-h-[500px] rounded-md flex flex-col"
-            ></div>
-        );
-    }
 
     return (
         <div
             ref={setNodeRef}
-            style={style}
             className="bg-gray-100 border-4 border-gray-100 w-full h-[500px] max-h-[500px] rounded-md flex flex-col"
         >
             {/* Column title */}
-            <div
-                {...attributes}
-                {...listeners}
-                className="bg-gray-950 text-white text-md h-[60px] cursor-grab rounded-md rounded-b-none p-3 font-bold flex items-center justify-between"
-            >
+            <div className="bg-gray-950 text-white text-md h-[60px] cursor-grab rounded-md rounded-b-none p-3 font-bold flex items-center justify-between">
                 <div className="flex gap-2">
                     <div className="flex justify-center items-center bg-gray-500 px-2 py-1 text-xs rounded-full">
-                        {tasks.length}
+                        {tasks?.length > 0 ? tasks.length : "0"}
                     </div>
-                    {column.title}
+                    {column}
                 </div>
-                <Trash2
-                            className="cursor-pointer m-2 hover:text-red-500"
-                            size={16}
-                            onMouseDown={() => {
-                                deleteColumn(column.id);
-                            }}
-                        />
-                
             </div>
 
             {/* Column task container */}
@@ -88,7 +51,8 @@ function ColumnContainer({
                 <SortableContext items={tasksIds}>
                     {tasks.map((task) => (
                         <TaskCard
-                            key={task.id}
+                            projectId={projectId}
+                            key={task._id}
                             task={task}
                             deleteTask={deleteTask}
                             updateTask={updateTask}
@@ -103,7 +67,16 @@ function ColumnContainer({
                 <TicketPlus className="h-4 w-4 mr-1" />
                 <span className="sr-only sm:not-sr-only">Add Task</span>
             </Button>
-            {open && <TaskCreate open={open} setOpen={setOpen} />}
+            {/* {open && (
+                <TaskCreate
+                    projectId={projectId}
+                    statusCol={column}
+                    sprint_id={sprint_id}
+                    open={open}
+                    setOpen={setOpen}
+                    idType="sprint_id"
+                />
+            )} */}
         </div>
     );
 }

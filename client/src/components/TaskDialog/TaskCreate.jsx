@@ -20,9 +20,9 @@ import {
 } from "@/components/ui/drawer";
 import { TaskFormCreate } from "./TaskFormCreate";
 
-export function TaskCreate({ open, setOpen }) {
+export function TaskCreate({projectId,statusCol, sprint_id, backlog_id, open, setOpen, idType }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
-
+    const table_id = sprint_id || backlog_id;
     if (isDesktop) {
         return (
             <Dialog open={open} onOpenChange={setOpen}>
@@ -33,7 +33,7 @@ export function TaskCreate({ open, setOpen }) {
                             Create your task here. Click save when youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <TaskFormCreate />
+                    <TaskFormCreate projectId={projectId} statusCol={statusCol} table_id={table_id} idType={idType}/>
                 </DialogContent>
             </Dialog>
         );
@@ -48,7 +48,7 @@ export function TaskCreate({ open, setOpen }) {
                         Create your task here. Click save when youre done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <TaskFormCreate className="px-4" />
+                <TaskFormCreate projectId={projectId} statusCol={statusCol} table_id={table_id} idType={idType} className="px-4" />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>
