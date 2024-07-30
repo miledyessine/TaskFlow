@@ -35,7 +35,6 @@ const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
             })
             .then((projectsResult) => {
                 setProjects(projectsResult.data);
-                console.log(projects);
             })
             .catch((error) => {
                 console.error("Error fetching projects data:", error);

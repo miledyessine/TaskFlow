@@ -76,7 +76,7 @@ export function TaskView({ task, assignee, open, setOpen }) {
                                     <h3 className="font-semibold text-gray-700">
                                         Priority :
                                     </h3>
-                                    <p className="text-gray-600">Urgent</p>
+                                    <p className="text-gray-600">{task.priority}</p>
                                 </div>
                             </div>
 

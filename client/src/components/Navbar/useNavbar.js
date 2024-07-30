@@ -33,7 +33,6 @@ export default (props) => {
                 const idTokenClaims = await getIdTokenClaims();
                 const token = idTokenClaims.__raw;
                 localStorage.setItem("authToken", token);
-                console.log("token:", idTokenClaims);
                 const username = idTokenClaims.name;
                 const email = idTokenClaims.email;
                 const role = idTokenClaims.role;

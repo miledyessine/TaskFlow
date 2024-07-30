@@ -1,38 +1,33 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/prop-types */
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+
 import {
     Pencil,
     Trash2,
-    Goal,
-    Flag,
-    ChevronDown,
     Workflow,
     Eye,
 } from "lucide-react";
-import { useState } from "react";
-
-import { Button } from "@/components/ui/button";
-import { TaskEdit } from "../TaskDialog/TaskEdit";
+import { useEffect, useState } from "react";
 import { SubtaskEdit } from "../SubtaskDialog/SubtaskEdit";
 import { TaskView } from "../TaskDialog/TaskView";
+import { useAxios } from "@/hooks/axioshook";
 
 const priorityColors = {
-    1: "text-red-500",
-    2: "text-orange-500",
-    3: "text-green-500",
+    Urgent: "text-red-800",
+    High: "text-red-500",
+    Normal: "text-orange-500",
+    Low: "text-green-500",
 };
 
-function SubtaskCard({ task, deleteTask, updateTask }) {
+function SubtaskCard({ subtask,projectId, deleteSubtask }) {
     const [mouseIsOver, setMouseIsOver] = useState(false);
 
     const [isEditing, setIsEditing] = useState(false);
 
     const [openDetail, setOpenDetail] = useState(false);
     const handleSave = (updatedTask) => {
-        updateTask(task.id, updatedTask);
+        updateTask(subtask._id, updatedTask);
         setIsEditing(false);
     };
 
@@ -44,7 +39,25 @@ function SubtaskCard({ task, deleteTask, updateTask }) {
     const handleOpenViewDialog = () => {
         setOpenView(true);
     };
+    const userFetcher = useAxios();
+    const [userData, setUserData] = useState();
+    const fetchData = () => {
+        userFetcher
+            .customFetchData({
+                method: "GET",
+                url: `/users/${subtask.assignee_id}`,
+            })
+            .then((userResult) => {
+                setUserData(userResult.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching user:", error);
+            });
+    };
 
+    useEffect(() => {
+        fetchData();
+    }, []);
     return (
         <>
             <div
@@ -70,7 +83,7 @@ function SubtaskCard({ task, deleteTask, updateTask }) {
                         />
                         <Trash2
                             size={16}
-                            onClick={() => deleteTask(task.id)}
+                            onClick={() => deleteSubtask(subtask._id)}
                             className="flex items-center justify-center hover:text-red-500 cursor-pointer"
                         />
                     </div>
@@ -79,20 +92,20 @@ function SubtaskCard({ task, deleteTask, updateTask }) {
                 <div className="flex items-center gap-1">
                     <span
                         className={`flex items-center ${
-                            priorityColors[task.priority]
+                            priorityColors[subtask.priority]
                         }`}
                     >
                         <Workflow size={14} />
                     </span>
-                    <h3 className="font-bold text-sm">{task.name}</h3>
+                    <h3 className="font-bold text-sm">{subtask.name}</h3>
                 </div>
 
-                <p className="text-gray-700 text-xs">{task.description}</p>
+                <p className="text-gray-700 text-xs">{subtask.description}</p>
             </div>
             {openView && (
-                <TaskView task={task} open={openView} setOpen={setOpenView} />
+                <TaskView task={subtask} assignee={userData} open={openView} setOpen={setOpenView} />
             )}
-            {openEdit && <SubtaskEdit open={openEdit} setOpen={setOpenEdit} />}
+            {openEdit && <SubtaskEdit subtask={subtask} assignee={userData}  projectId={projectId} open={openEdit} setOpen={setOpenEdit} />}
         </>
     );
 }

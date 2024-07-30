@@ -18,9 +18,9 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { SubtaskForm } from "./SubtaskForm";
+import { SubtaskFormEdit } from "./SubtaskFormEdit";
 
-export function SubtaskEdit({ open, setOpen }) {
+export function SubtaskEdit({ projectId,subtask, assignee,open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
@@ -33,7 +33,8 @@ export function SubtaskEdit({ open, setOpen }) {
                             Edit your subtask here. Click save when youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <SubtaskForm />
+                    {console.log(assignee)}
+                    <SubtaskFormEdit projectId={projectId}  subtask={subtask} assignee={assignee}/>
                 </DialogContent>
             </Dialog>
         );
@@ -41,14 +42,14 @@ export function SubtaskEdit({ open, setOpen }) {
 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerContent >
+            <DrawerContent>
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Edit subtask</DrawerTitle>
                     <DrawerDescription>
                         Edit your sybtask here. Click save when youre done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <SubtaskForm className="px-4" />
+                <SubtaskFormEdit className="px-4" projectId={projectId}  subtask={subtask} assignee={assignee}/>
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>

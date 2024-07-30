@@ -18,9 +18,9 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { SubtaskForm } from "./SubtaskForm";
+import { SubtaskFormCreate } from "./SubtaskFormCreate";
 
-export function SubtaskCreate({ open, setOpen }) {
+export function SubtaskCreate({ projectId, taskId, open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
@@ -30,10 +30,11 @@ export function SubtaskCreate({ open, setOpen }) {
                     <DialogHeader>
                         <DialogTitle>Create subtask</DialogTitle>
                         <DialogDescription>
-                            Create your subtask here. Click save when youre done.
+                            Create your subtask here. Click save when youre
+                            done.
                         </DialogDescription>
                     </DialogHeader>
-                    <SubtaskForm />
+                    <SubtaskFormCreate projectId={projectId} taskId={taskId} />
                 </DialogContent>
             </Dialog>
         );
@@ -41,14 +42,18 @@ export function SubtaskCreate({ open, setOpen }) {
 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerContent >
+            <DrawerContent>
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Create subtask</DrawerTitle>
                     <DrawerDescription>
                         Create your subtask here. Click save when youre done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <SubtaskForm className="px-4" />
+                <SubtaskFormCreate
+                    projectId={projectId}
+                    taskId={taskId}
+                    className="px-4"
+                />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>

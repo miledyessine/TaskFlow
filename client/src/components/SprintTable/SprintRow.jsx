@@ -10,11 +10,14 @@ import {
     ChevronUp,
     Workflow,
     ChevronRight,
+    CopyPlus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { TaskEdit } from "../TaskDialog/TaskEdit";
 import { TaskView } from "../TaskDialog/TaskView";
 import { useAxios } from "@/hooks/axioshook";
+import { SubtaskCreate } from "../SubtaskDialog/SubtaskCreate";
+import { SubtaskEdit } from "../SubtaskDialog/SubtaskEdit";
 
 function SprintRow({ task }) {
     const {
@@ -33,7 +36,8 @@ function SprintRow({ task }) {
     const [subtasks, setSubtasks] = useState([]);
     const [openEdit, setOpenEdit] = useState(false);
     const [openView, setOpenView] = useState(false);
-
+    const [openEditsubtask, setOpenEditsubtask] = useState(false);
+    const [openViewsubtask, setOpenViewsubtask] = useState(false);
     const handleOpenSubtask = () => {
         setOpenSubtask(!openSubtask);
     };
@@ -44,6 +48,18 @@ function SprintRow({ task }) {
 
     const handleOpenViewDialog = () => {
         setOpenView(true);
+    };
+    const handleOpenEditSubtaskDialog = () => {
+        setOpenEditsubtask(true);
+    };
+
+    const handleOpenViewSubtaskDialog = () => {
+        setOpenViewsubtask(true);
+    };
+
+    const [openCreateSubtask, setOpenCreateSubtask] = useState(false);
+    const handleOpenCreateSubtaskDialog = async () => {
+        setOpenCreateSubtask(true);
     };
     const TaskDelete = useAxios();
 
@@ -57,7 +73,19 @@ function SprintRow({ task }) {
         );
         console.log("delete");
     };
-
+    const SubtaskDelete = useAxios();
+    function deleteSubtask(id) {
+        const newAxiosParams = {
+            method: "DELETE",
+            url: `/tasks/subtasks/${id}`,
+        };
+        SubtaskDelete.customFetchData(newAxiosParams).then((data) =>
+            console.log(data)
+        );
+        console.log("delete");
+        const newSubtasks = subtasks.filter((sub) => sub._id !== id);
+        setSubtasks(newSubtasks);
+    }
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
@@ -158,6 +186,11 @@ function SprintRow({ task }) {
                         size={16}
                         onMouseDown={handleOpenViewDialog}
                     />
+                    <CopyPlus
+                        size={16}
+                        onClick={handleOpenCreateSubtaskDialog}
+                        className=" hover:text-teal-700 cursor-pointer"
+                    />
                     <Pencil
                         className="cursor-pointer hover:text-green-800"
                         size={16}
@@ -195,19 +228,35 @@ function SprintRow({ task }) {
                                 <Eye
                                     className="cursor-pointer hover:text-gray-500"
                                     size={16}
-                                    onMouseDown={handleOpenViewDialog}
+                                    onMouseDown={handleOpenViewSubtaskDialog}
                                 />
                                 <Pencil
                                     className="cursor-pointer hover:text-green-800"
                                     size={16}
-                                    onMouseDown={handleOpenEditDialog}
+                                    onMouseDown={handleOpenEditSubtaskDialog}
                                 />
                                 <Trash2
                                     className="cursor-pointer hover:text-red-500"
                                     size={16}
-                                    onMouseDown={handleDelete}
+                                    onMouseDown={()=>deleteSubtask(subtask._id)}
                                 />
                             </TableCell>
+                            {openEditsubtask && (
+                                <SubtaskEdit
+                                    subtask={subtask}
+                                    assignee={userData}
+                                    open={openEditsubtask}
+                                    setOpen={setOpenEditsubtask}
+                                />
+                            )}
+                            {openViewsubtask && (
+                                <TaskView
+                                    task={subtask}
+                                    assignee={userData}
+                                    open={openViewsubtask}
+                                    setOpen={setOpenViewsubtask}
+                                />
+                            )}
                         </TableRow>
                     ))}
                 </>
@@ -226,6 +275,14 @@ function SprintRow({ task }) {
                     assignee={userData}
                     open={openView}
                     setOpen={setOpenView}
+                />
+            )}
+
+            {openCreateSubtask && (
+                <SubtaskCreate
+                    taskId={task._id}
+                    open={openCreateSubtask}
+                    setOpen={setOpenCreateSubtask}
                 />
             )}
         </>

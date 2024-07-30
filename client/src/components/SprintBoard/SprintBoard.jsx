@@ -57,7 +57,6 @@ export function SprintBoard() {
                     })
                     .then((workflowResult) => {
                         setColumns(workflowResult.workflow);
-                        console.log("herre", workflowResult.workflow);
                     })
                     .catch((error) => {
                         console.error("Error fetching project data:", error);
