@@ -1,8 +1,7 @@
 import axios from "axios";
-import { useEffect, useState,useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useAxios } from "./axioshook";
 import { SocketContext } from "@/context/socket";
-
 
 export default () => {
     const [openCreate, setOpenCreate] = useState(false);
@@ -10,8 +9,7 @@ export default () => {
     const { customFetchData, fetchHandler } = useAxios();
     const [users, setUsers] = useState({});
     const socket = useContext(SocketContext);
-    
-    
+
     useEffect(() => {
         const handleProjectUpdate = () => {
             customFetchData({ method: "GET", url: "/projects" })
@@ -24,10 +22,9 @@ export default () => {
                     console.error("Error fetching projects:", error);
                 });
         };
-        socket.on('ProjectListModified', handleProjectUpdate);
-        
+        socket.on("ProjectListModified", handleProjectUpdate);
     }, []);
-    
+
     useEffect(() => {
         customFetchData({ method: "GET", url: "/projects" })
             .then((projectResult) => {

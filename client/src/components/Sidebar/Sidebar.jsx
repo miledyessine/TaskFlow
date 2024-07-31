@@ -22,10 +22,12 @@ import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { getInitials } from "@/hooks/getInitials";
 import { useAxios } from "@/hooks/axioshook";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { SocketContext } from "@/context/socket";
 const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
     const { user } = useAuth0();
     const [projects, setProjects] = useState();
+    const socket = useContext(SocketContext);
     const projectsFetcher = useAxios();
     const fetchData = () => {
         projectsFetcher
@@ -40,6 +42,9 @@ const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
                 console.error("Error fetching projects data:", error);
             });
     };
+    useEffect(() => {
+        socket.on("ProjectListModified", fetchData);
+    }, []);
     useEffect(() => {
         fetchData();
     }, []);
