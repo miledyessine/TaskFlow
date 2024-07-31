@@ -35,6 +35,7 @@ function Project() {
         project,
         user,
         tables,
+        setTables,
         tasks,
         activeId,
         overTableId,
@@ -123,6 +124,7 @@ function Project() {
                                 <DroppableTable
                                     key={table._id}
                                     table={table}
+                                    setTables={setTables}
                                     tasks={
                                         tasks.filter(
                                             (task) =>

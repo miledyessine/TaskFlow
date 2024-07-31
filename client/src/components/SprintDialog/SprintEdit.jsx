@@ -18,9 +18,9 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer";
-import { ProjectFormCreate } from "./ProjectFormCreate";
+import { SprintFormEdit } from "./SprintFormEdit";
 
-export function ProjectCreate({setProjects, open, setOpen }) {
+export function SprintEdit({ sprint, setSprints, open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
@@ -28,13 +28,12 @@ export function ProjectCreate({setProjects, open, setOpen }) {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Create project </DialogTitle>
+                        <DialogTitle>Edit sprint </DialogTitle>
                         <DialogDescription>
-                            Create your project here. Click save when youre
-                            done.
+                            Edit your sprint here. Click save when youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <ProjectFormCreate setProjects={setProjects} setOpen={setOpen}/>
+                    <SprintFormEdit sprint={sprint} setSprints={setSprints} setOpen={setOpen}/>
                 </DialogContent>
             </Dialog>
         );
@@ -44,12 +43,17 @@ export function ProjectCreate({setProjects, open, setOpen }) {
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerContent>
                 <DrawerHeader className="text-left">
-                    <DrawerTitle>Create project</DrawerTitle>
+                    <DrawerTitle>Edit sprint</DrawerTitle>
                     <DrawerDescription>
-                        Create your project here. Click save when youre done.
+                        Edit your sprint here. Click save when youre done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <ProjectFormCreate className="px-4" setProjects={setProjects} setOpen={setOpen}/>
+                <SprintFormEdit
+                    className="px-4"
+                    sprint={sprint}
+                    setSprints={setSprints}
+                    setOpen={setOpen}
+                />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>

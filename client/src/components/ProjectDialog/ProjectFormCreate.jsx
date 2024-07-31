@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import {  useState } from "react";
+import { useState,useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,8 +8,11 @@ import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { useAxios } from "@/hooks/axioshook";
 import { useAuth0 } from "@auth0/auth0-react";
+import { SocketContext } from "@/context/socket";
 
-export function ProjectFormCreate({ className }) {
+
+export function ProjectFormCreate({ setProjects,setOpen, className }) {
+    const socket = useContext(SocketContext);
     const { user } = useAuth0();
     const [formData, setFormData] = useState({
         name: "",
@@ -18,6 +21,7 @@ export function ProjectFormCreate({ className }) {
         workflow: ["", ""],
         createdBy: user.sub,
     });
+
     // a refaire
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -42,22 +46,30 @@ export function ProjectFormCreate({ className }) {
         setFormData((prev) => ({ ...prev, workflow: [...prev.workflow, ""] }));
     };
 
-    const handleRemoveItem = (index, key,e) => {
+    const handleRemoveItem = (index, key, e) => {
         e.preventDefault();
         const updatedArray = [...formData[key]];
         updatedArray.splice(index, 1);
         setFormData((prev) => ({ ...prev, [key]: updatedArray }));
     };
     const ProjectCreation = useAxios();
-    const onSubmit = async () => {
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
         const newAxiosParams = {
             method: "POST",
             url: "/projects",
             data: formData,
         };
-        await ProjectCreation.customFetchData(newAxiosParams).then((data) =>
-            console.log(data)
-        );
+        await ProjectCreation.customFetchData(newAxiosParams)
+            .then((response) => {
+                setProjects((prevProjects) => [...prevProjects, response.data]);
+                setOpen(false)
+                socket.emit('projectUpdated')
+            })
+            .catch((error) => {
+                console.error("Error creating project:", error);
+            });
     };
     return (
         <form

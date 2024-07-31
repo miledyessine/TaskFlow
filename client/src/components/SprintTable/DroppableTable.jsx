@@ -23,12 +23,17 @@ import SprintRow from "./SprintRow";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { TaskCreate } from "../TaskDialog/TaskCreate";
-import { TicketPlus } from "lucide-react";
+import { Settings, TicketPlus } from "lucide-react";
 import { Link } from "react-router-dom";
-export function DroppableTable({ table, tasks }) {
+import { SprintEdit } from "../SprintDialog/SprintEdit";
+export function DroppableTable({ table,setTables, tasks }) {
     const [open, setOpen] = useState(false);
     const handleOpenCreateDialog = async () => {
         setOpen(true);
+    };
+    const [openEdit, setOpenEdit] = useState(false);
+    const handleOpenEditDialog = async () => {
+        setOpenEdit(true);
     };
     const { setNodeRef } = useDroppable({
         id: table._id,
@@ -72,6 +77,13 @@ export function DroppableTable({ table, tasks }) {
                             <span className="sr-only sm:not-sr-only">
                                 Add Task
                             </span>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={handleOpenEditDialog}
+                        >
+                            <Settings className="h-4 w-4 mr-1" />
+                            <span className="sr-only sm:not-sr-only">Edit</span>
                         </Button>
                     </div>
                 </div>
@@ -119,6 +131,14 @@ export function DroppableTable({ table, tasks }) {
                     open={open}
                     setOpen={setOpen}
                     idType={isSprint ? "sprint_id" : "backlog_id"}
+                />
+            )}
+            {openEdit && (
+                <SprintEdit
+                    sprint={table}
+                    setSprints={setTables}
+                    open={openEdit}
+                    setOpen={setOpenEdit}
                 />
             )}
         </Card>

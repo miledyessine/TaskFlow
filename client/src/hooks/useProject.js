@@ -190,6 +190,7 @@ export default () => {
         project,
         user,
         tables,
+        setTables,
         tasks,
         activeId,
         overTableId,

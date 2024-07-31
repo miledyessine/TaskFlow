@@ -13,7 +13,7 @@ import { Badge } from "../ui/badge";
 import { useState } from "react";
 import { ProjectEdit } from "../ProjectDialog/ProjectEdit";
 import { Link } from "react-router-dom";
-function ProjectCard({ project, createdBy }) {
+function ProjectCard({ project,setProjects, createdBy }) {
     const [open, setOpen] = useState(false);
     const { name, description } = project;
     const id = project._id;
@@ -46,7 +46,7 @@ function ProjectCard({ project, createdBy }) {
                             {createdBy}
                         </Badge>
                     </CardFooter>
-                </Link>{open && <ProjectEdit project={project} open={open} setOpen={setOpen} />}
+                </Link>{open && <ProjectEdit project={project} setProjects={setProjects} open={open} setOpen={setOpen} />}
             </Card>
             
         

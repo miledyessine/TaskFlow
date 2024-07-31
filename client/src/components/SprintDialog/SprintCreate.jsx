@@ -21,7 +21,7 @@ import {
 import { SprintFormCreate } from "./SprintFormCreate";
 
 
-export function SprintCreate({ open, setOpen }) {
+export function SprintCreate({ sprint, setSprints,open, setOpen }) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
 
     if (isDesktop) {
@@ -35,7 +35,7 @@ export function SprintCreate({ open, setOpen }) {
                             youre done.
                         </DialogDescription>
                     </DialogHeader>
-                    <SprintFormCreate />
+                    <SprintFormCreate sprint={sprint} setSprints={setSprints} setOpen={setOpen}/>
                 </DialogContent>
             </Dialog>
         );
@@ -51,7 +51,7 @@ export function SprintCreate({ open, setOpen }) {
                         done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <SprintFormCreate className="px-4" />
+                <SprintFormCreate className="px-4" sprint={sprint} setSprints={setSprints} setOpen={setOpen}/>
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>

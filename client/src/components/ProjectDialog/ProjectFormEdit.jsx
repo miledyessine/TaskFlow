@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,14 +8,16 @@ import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { useAxios } from "@/hooks/axioshook";
 import { Separator } from "../ui/separator";
-
-export function ProjectFormEdit({ project, className }) {
+import { SocketContext } from "@/context/socket";
+export function ProjectFormEdit({ project, setProjects, setOpen, className }) {
     const [formData, setFormData] = useState({
         name: project.name || "",
         description: project.description || "",
         typesOfTickets: project.typesOfTickets || [""],
         workflow: project.workflow || ["", ""],
     });
+
+    const socket = useContext(SocketContext);
     // a refaire
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -47,25 +49,38 @@ export function ProjectFormEdit({ project, className }) {
         setFormData((prev) => ({ ...prev, [key]: updatedArray }));
     };
     const ProjectDelete = useAxios();
-    const deleteProject = () => {
+    const deleteProject = (e) => {
+        e.preventDefault();
         const newAxiosParams = {
             method: "DELETE",
             url: `/projects/${project._id}`,
         };
-        ProjectDelete.customFetchData(newAxiosParams).then((data) =>
-            console.log(data)
-        );
+        ProjectDelete.customFetchData(newAxiosParams).then(() => {
+            setProjects((prevProjects) =>
+                prevProjects.filter((proj) => proj._id !== project._id)
+            );
+            setOpen(false);
+
+            socket.emit("projectUpdated");
+        });
     };
     const ProjectEdit = useAxios();
-    const onSubmit = async () => {
+    const onSubmit = async (e) => {
+        e.preventDefault();
         const newAxiosParams = {
             method: "PATCH",
             url: `/projects/${project._id}`,
             data: formData,
         };
-        await ProjectEdit.customFetchData(newAxiosParams).then((data) =>
-            console.log(data)
-        );
+        await ProjectEdit.customFetchData(newAxiosParams).then((response) => {
+            setProjects((prevProjects) =>
+                prevProjects.map((p) =>
+                    p._id === project._id ? response.data : p
+                )
+            );
+            setOpen(false);
+            socket.emit("projectUpdated");
+        });
     };
     return (
         <form

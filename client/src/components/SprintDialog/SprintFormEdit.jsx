@@ -17,16 +17,14 @@ import { DatePicker } from "../ui/date-picker";
 
 import { format } from "date-fns";
 import { useAxios } from "@/hooks/axioshook";
-import { useParams } from "react-router-dom";
-export function SprintFormCreate({ sprint, setSprints, setOpen,className }) {
-    const { project_id } = useParams();
+import { Separator } from "../ui/separator";
+export function SprintFormEdit({ sprint, setSprints, setOpen, className }) {
     const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        duration: "", 
-        start_date: "",
-        end_date: "",
-        project_id: project_id,
+        name: sprint.name || "",
+        description: sprint.description || "",
+        duration: sprint.duration || "",
+        start_date: format(sprint.start_date, "MM/dd/yyyy") || "",
+        end_date: format(sprint.end_date, "MM/dd/yyyy") || "",
     });
 
     const handleInputChange = (e) => {
@@ -39,7 +37,6 @@ export function SprintFormCreate({ sprint, setSprints, setOpen,className }) {
                     end_date: "",
                 }));
             } else {
-                
                 setFormData((prev) => ({
                     ...prev,
                     [id]: value,
@@ -68,17 +65,36 @@ export function SprintFormCreate({ sprint, setSprints, setOpen,className }) {
             end_date: formattedDate,
         }));
     };
-
-    const SprintCreation = useAxios();
-    const onSubmit = async () => {
+    const SprintDelete = useAxios();
+    const deleteSprint = (e) => {
+        e.preventDefault();
         const newAxiosParams = {
-            method: "POST",
-            url: "/sprints",
+            method: "DELETE",
+            url: `/sprints/${sprint._id}`,
+        };
+        SprintDelete.customFetchData(newAxiosParams).then(() => {
+            setSprints((prevSprints) =>
+                prevSprints.filter((spr) => spr._id !== sprint._id)
+            );
+            setOpen(false);
+        });
+    };
+    const SprintEdit = useAxios();
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const newAxiosParams = {
+            method: "PATCH",
+            url: `/sprints/${sprint._id}`,
             data: formData,
         };
-        await SprintCreation.customFetchData(newAxiosParams).then((data) =>
-            console.log(data)
-        );
+        await SprintEdit.customFetchData(newAxiosParams).then((response) => {
+            setSprints((prevSprints) =>
+                prevSprints.map((s) =>
+                    s._id === sprint._id ? response.data : s
+                )
+            );
+            setOpen(false);
+        });
     };
 
     return (
@@ -139,8 +155,8 @@ export function SprintFormCreate({ sprint, setSprints, setOpen,className }) {
                 <Label required>Start Date</Label>
                 <DatePicker
                     id="start_date"
-                    // requiredBtn={formData.duration === "custom"}
                     onSelect={handleStartDateSelect}
+                    datePlaceholder={formData.start_date}
                 />
             </div>
             <div className="grid gap-2">
@@ -149,11 +165,15 @@ export function SprintFormCreate({ sprint, setSprints, setOpen,className }) {
                 </Label>
                 <DatePicker
                     id="end_date"
-                    // requiredBtn={formData.duration === "custom"}
                     onSelect={handleEndDateSelect}
                     disabledBtn={formData.duration !== "custom"}
+                    datePlaceholder={formData.end_date}
                 />
             </div>
+            <Separator />
+            <Button variant="destructive" onClick={deleteSprint}>
+                Delete Sprint
+            </Button>
             <Button type="submit">Save</Button>
         </form>
     );

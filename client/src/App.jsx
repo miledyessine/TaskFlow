@@ -29,7 +29,7 @@ function App() {
                         ? "p-4"
                         : isSidebarCollapsed
                         ? "pl-[80px]"
-                        : "pl-[230px]"
+                        : "pl-[280px]"
                 )}
             >
                 <Outlet />

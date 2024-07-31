@@ -9,6 +9,7 @@ function Projects() {
         openCreate,
         setOpenCreate,
         projects,
+        setProjects,
         users,
     } = useProjects();
 
@@ -25,11 +26,12 @@ function Projects() {
 
             <div className="classgroup mt-5">
                 {projects && (
-                    <ul className="grid w-max h-full gap-7 p-4 sm:grid-cols- md:grid-cols-4 md:gap-4 sm:gap-5">
+                    <ul className="grid w-fit h-full gap-7 p-4 sm:grid-cols- md:grid-cols-3 lg:grid-cols-4  md:gap-4 sm:gap-5">
                         {projects.map((project) => (
                             <ProjectCard
                                 key={project._id}
                                 project={project}
+                                setProjects={setProjects}
                                 createdBy={users[project.createdBy]}
                             />
                         ))}
@@ -37,7 +39,7 @@ function Projects() {
                 )}
             </div>
             {openCreate && (
-                <ProjectCreate open={openCreate} setOpen={setOpenCreate} />
+                <ProjectCreate setProjects={setProjects} open={openCreate} setOpen={setOpenCreate} />
             )}
         </div>
     );

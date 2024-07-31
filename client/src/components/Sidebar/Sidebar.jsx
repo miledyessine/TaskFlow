@@ -47,7 +47,7 @@ const Sidebar = ({ isCollapsed, CollapseSidebar }) => {
     return (
         <div className="overflow-hidden z-40 border-r-1 fixed top-[57px] h-full flex-col justify-between">
             <RPSidebar
-                width={isCollapsed ? "80px" : "230px"}
+                width={isCollapsed ? "80px" : "fit"}
                 className="h-full bg-white"
                 collapsed={isCollapsed}
                 collapsedWidth="md"
